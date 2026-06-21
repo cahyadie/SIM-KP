@@ -1,3 +1,4 @@
 <?php
-// Arahkan ke file bootstrap Laravel
+
+// Meneruskan request dari Vercel ke index.php bawaan Laravel
 require __DIR__ . '/../public/index.php';
