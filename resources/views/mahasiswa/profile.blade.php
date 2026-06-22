@@ -40,6 +40,18 @@
             {{-- KOLOM KANAN: FORM INPUT --}}
             <div class="col-md-8 col-lg-9 p-4 p-lg-5 bg-white">
                 
+                {{-- INSTRUKSI WAJIB ISI DATA (Hanya muncul jika data belum lengkap) --}}
+                @if(empty($mahasiswa->nim) || empty($mahasiswa->angkatan) || empty($mahasiswa->no_hp))
+                    <div class="alert border-start border-4 border-warning shadow-sm mb-4" role="alert">
+                        <h5 class="alert-heading fw-bold mb-2">
+                            <i class="text-warning"></i> Selamat Datang!
+                        </h5>
+                        <p class="mb-0 text-dark">
+                            Sebelum Anda dapat mengakses menu dan fitur di dalam sistem, Anda <strong>diwajibkan untuk melengkapi data akademik dan kontak</strong> Anda di bawah ini dengan benar.
+                        </p>
+                    </div>
+                @endif
+                
                 @if ($errors->any())
                     <div class="alert alert-danger border-0 shadow-sm bg-danger-soft mb-4 py-2">
                         <ul class="mb-0 small">
@@ -96,7 +108,7 @@
                                         <span class="input-group-text bg-light border-end-0"><i class="bi bi-whatsapp text-success"></i></span>
                                         <input type="text" name="no_hp" class="form-control bg-white" value="{{ $mahasiswa->no_hp ?? '' }}" required placeholder="0812xxxx">
                                     </div>
-                                    <div class="form-text small">Opsional</div>
+                                    <div class="form-text small">Nomor yang aktif dihubungi.</div>
                                 </div>
                             </div>
                         </div>
@@ -104,7 +116,7 @@
                         {{-- Tombol Simpan --}}
                         <div class="col-12 text-end border-top pt-3 mt-4">
                             <button type="submit" class="btn btn-primary px-4 py-2 fw-bold shadow-sm">
-                                <i class="bi bi-check-circle-fill me-2"></i> Simpan Perubahan
+                                <i class="bi bi-check-circle-fill me-2"></i> Simpan Data & Lanjutkan
                             </button>
                         </div>
 

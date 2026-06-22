@@ -182,11 +182,35 @@
         }
     </style>
 
-    {{-- FLASH MESSAGE --}}
+    {{-- FLASH MESSAGE PENGISIAN PROFIL / SUKSES LAINNYA --}}
     @if(session('success'))
-        <div class="alert alert-success border-0 shadow-sm rounded-4 mb-4">
-            <i class="bi bi-check-circle-fill me-2"></i>
-            {{ session('success') }}
+        <div class="alert alert-success border-0 shadow-sm rounded-4 mb-4 d-flex align-items-center">
+            <i class="bi bi-check-circle-fill fs-4 me-3"></i>
+            <div>
+                <strong>Berhasil!</strong><br>
+                {{ session('success') }}
+            </div>
+        </div>
+    @endif
+
+    {{-- ALERT DAFTAR MAGANG (Muncul jika belum ada riwayat magang) --}}
+    @if(empty($magang) && $riwayat_magang->isEmpty())
+        <div class="alert alert-warning border-start border-4 border-warning shadow-sm mb-4 rounded-4" role="alert">
+            <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+                <div class="d-flex align-items-center">
+                    <i class="bi bi-info-circle-fill fs-3 text-warning me-3"></i>
+                    <div>
+                        <h5 class="alert-heading fw-bold mb-1">Langkah Selanjutnya: Daftar Magang</h5>
+                        <p class="mb-0 text-dark">
+                            Profil Anda sudah lengkap. Sebelum mengakses fitur lainnya, Anda diwajibkan untuk <strong>melakukan pendaftaran magang</strong> terlebih dahulu.
+                        </p>
+                    </div>
+                </div>
+                {{-- Tombol diarahkan ke form pendaftaran magang --}}
+                <a href="{{ route('magang.create') }}" class="btn btn-warning fw-bold text-dark px-4 shadow-sm rounded-pill">
+                    Daftar Sekarang <i class="bi bi-arrow-right ms-1"></i>
+                </a>
+            </div>
         </div>
     @endif
 
@@ -207,7 +231,6 @@
                     @endphp
 
                     <h3 class="fw-bold mb-2">
-                        {{-- PERUBAHAN LOGIKA: Cek DB Status dulu, baru fallback ke perbandingan tanggal --}}
                         @if($magang->status_kegiatan == 'selesai')
                             Selesai Magang
                         @elseif($magang->status_kegiatan == 'skp')
@@ -236,8 +259,7 @@
 
     {{-- ALERT AGENDA SKP MENDATANG --}}
     @if($magang && $magang->status_jadwal_skp == 'disetujui' && $magang->status_skp == 'belum')
-        <div
-            class="alert bg-white border-0 shadow-sm d-flex align-items-center mb-4 rounded-4 border-start border-5 border-primary">
+        <div class="alert bg-white border-0 shadow-sm d-flex align-items-center mb-4 rounded-4 border-start border-5 border-primary">
             <div class="bg-primary-light text-primary rounded-circle d-flex justify-content-center align-items-center me-3"
                 style="width: 48px; height: 48px; flex-shrink:0;">
                 <i class="bi bi-calendar-event fs-4"></i>
@@ -245,11 +267,7 @@
             <div>
                 <h6 class="fw-bold text-primary mb-1">Agenda Seminar (SKP) Mendatang</h6>
                 <p class="mb-0 text-secondary small">
-                    Jadwal: <strong
-                        class="text-dark">{{ \Carbon\Carbon::parse($magang->jadwal_terpilih)->format('l, d F Y - H:i') }}
-                        WIB</strong>
-                    <br>
-                    <!-- Lokasi: <span class="badge bg-light text-danger border border-danger ms-1"><i class="bi bi-geo-alt-fill me-1"></i>{{ $magang->ruangan_skp }}</span> -->
+                    Jadwal: <strong class="text-dark">{{ \Carbon\Carbon::parse($magang->jadwal_terpilih)->format('l, d F Y - H:i') }} WIB</strong>
                 </p>
                 <p class="text small mb-0">
                     Jangan Lupa Mengabarkan Dosen Pembimbing Untuk Ruangannya yaa!!
@@ -298,14 +316,11 @@
                                     </div>
 
                                     @php
-                                        // PERUBAHAN LOGIKA: Cek dinamis untuk tabel riwayat
                                         $m_hari_ini = \Carbon\Carbon::now()->startOfDay();
                                         $m_mulai = \Carbon\Carbon::parse($m->tanggal_mulai)->startOfDay();
                                         $m_selesai = \Carbon\Carbon::parse($m->tanggal_selesai)->startOfDay();
-
                                         $status_tampil = ucfirst($m->status_kegiatan);
 
-                                        // Buat penamaan status lebih rapi & terstruktur
                                         if ($m->status_kegiatan == 'skp') {
                                             $status_tampil = 'Tahap Seminar KP';
                                         } elseif ($m->status_kegiatan == 'selesai') {
@@ -332,8 +347,7 @@
                                     </div>
 
                                     <small class="text-muted">
-                                        sampai
-                                        {{ \Carbon\Carbon::parse($m->tanggal_selesai)->format('d M Y') }}
+                                        sampai {{ \Carbon\Carbon::parse($m->tanggal_selesai)->format('d M Y') }}
                                     </small>
                                 </td>
 
@@ -350,9 +364,7 @@
 
                                         <a href="{{ route('logbook.index', $m->id) }}"
                                             class="btn btn-primary btn-sm rounded-3 px-3 shadow-sm">
-
-                                            <i class="bi bi-journal-text me-1"></i>
-                                            Logbook
+                                            <i class="bi bi-journal-text me-1"></i> Logbook
                                         </a>
 
                                     @else
@@ -365,9 +377,7 @@
 
                                     <a href="{{ route('mahasiswa.riwayat-magang.edit', $m->id) }}"
                                         class="btn btn-outline-secondary btn-sm rounded-3 px-3 shadow-sm ms-1">
-
-                                        <i class="bi bi-pencil me-1"></i>
-                                        Edit
+                                        <i class="bi bi-pencil me-1"></i> Edit
                                     </a>
 
                                 </td>
@@ -441,7 +451,6 @@
                 <div class="card-body p-3">
 
                     <div class="d-flex align-items-center mb-3">
-
                         <div>
                             <h5 class="section-title mb-1">Panduan Seminar Kerja Praktik (SKP)</h5>
                         </div>

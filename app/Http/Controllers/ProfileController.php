@@ -20,20 +20,20 @@ class ProfileController extends Controller
     {
         $user = Auth::user();
 
-        // Validasi Input (Hapus validasi 'prodi' karena akan diset manual)
+        // Validasi Input
         $request->validate([
             'nim' => 'required|numeric|unique:mahasiswas,nim,' . ($user->mahasiswa->id ?? 'null'),
             'angkatan' => 'required|numeric|digits:4',
             'no_hp' => 'required|numeric',
         ]);
 
-        // Simpan Data
+        // Simpan atau Update Data Mahasiswa
         Mahasiswa::updateOrCreate(
             ['user_id' => $user->id],
             [
                 'nim' => $request->nim,
                 'angkatan' => $request->angkatan,
-                'prodi' => 'Teknologi Informasi', // <--- AUTO SET DI SINI
+                'prodi' => 'Teknologi Informasi', // Auto set
                 'no_hp' => $request->no_hp 
             ]
         );
@@ -41,6 +41,7 @@ class ProfileController extends Controller
         // Opsional: Update kolom bantu di tabel users jika ada
         // $user->update(['nomor_induk' => $request->nim]);
 
-        return redirect()->route('mahasiswa.dashboard')->with('success', 'Profil berhasil diperbarui!');
+        // Redirect ke dashboard dengan pesan instruksi selanjutnya
+        return redirect()->route('mahasiswa.dashboard')->with('success', 'Data profil berhasil dilengkapi! Silakan lanjutkan ke pendaftaran magang.');
     }
 }

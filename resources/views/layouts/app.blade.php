@@ -42,50 +42,53 @@
 
         <div id="page-content-wrapper">
             
-            <nav class="navbar navbar-expand-lg navbar-light top-navbar">
-                <div class="container-fluid align-items-center">
-                    <button class="btn d-lg-none me-2" id="mobileToggle">
-                        <i class="bi bi-list fs-4"></i>
+            <nav class="navbar navbar-expand bg-white border-bottom shadow-sm mb-3" style="height: 72px; padding: 0 1rem !important; position: sticky; top: 0; z-index: 1020;">
+                
+                <div class="d-flex align-items-center me-auto">
+                    
+                    <button class="btn btn-link text-dark p-0 border-0 shadow-none me-3 d-lg-none" id="mobileToggle">
+                        <i class="bi bi-list" style="font-size: 2rem;"></i>
                     </button>
                     
-                    <div class="page-header-title ms-1 ms-lg-0">
-                        <h4 class="mb-0 fw-bold text-dark">@yield('title', 'Dashboard')</h4>
-                    </div>
+                    <h4 class="mb-0 fw-bold text-dark d-none d-lg-block">@yield('title', 'Dashboard')</h4>
                     
-                    <div class="ms-auto d-flex align-items-center">
-                        <div class="user-info d-none d-md-block me-3 text-end">
-                            <div class="fw-bold small">{{ Auth::user()->name }}</div>
-                            <span class="badge bg-primary-subtle text-primary rounded-pill" style="font-size: 0.7rem;">
-                                {{ ucfirst(Auth::user()->role) }}
-                            </span>
-                        </div>
+                    <h5 class="mb-0 fw-bold text-dark d-lg-none text-truncate" style="max-width: 180px;">@yield('title', 'Dashboard')</h5>
+                </div>
 
-                        <div class="dropdown">
-                            <div class="user-avatar" data-bs-toggle="dropdown">
-                                @if(Auth::user()->avatar)
-                                    <img src="{{ Auth::user()->avatar }}" alt="User">
-                                @else
-                                    <div class="d-flex align-items-center justify-content-center h-100 bg-primary text-white fw-bold">
-                                        {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
-                                    </div>
-                                @endif
-                            </div>
-                            <ul class="dropdown-menu dropdown-menu-end border-0 shadow mt-3">
-                                @if(Auth::user()->role === 'mahasiswa')
-                                    <li><a class="dropdown-item" href="{{ route('profile.edit') }}">Profil Saya</a></li>
-                                    <li><hr class="dropdown-divider"></li>
-                                @endif
-                                <li>
-                                    <a class="dropdown-item text-danger" href="{{ route('logout') }}"
-                                       onclick="event.preventDefault(); document.getElementById('logout-form-nav').submit();">
-                                        Logout
-                                    </a>
-                                    <form id="logout-form-nav" action="{{ route('logout') }}" method="POST" class="d-none">@csrf</form>
-                                </li>
-                            </ul>
+                <div class="d-flex align-items-center">
+                    <div class="user-info d-none d-md-block me-3 text-end">
+                        <div class="fw-bold small">{{ Auth::user()->name }}</div>
+                        <span class="badge bg-primary-subtle text-primary rounded-pill" style="font-size: 0.7rem;">
+                            {{ ucfirst(Auth::user()->role) }}
+                        </span>
+                    </div>
+
+                    <div class="dropdown">
+                        <div class="user-avatar" data-bs-toggle="dropdown" style="cursor: pointer; width: 40px; height: 40px;">
+                            @if(Auth::user()->avatar)
+                                <img src="{{ Auth::user()->avatar }}" alt="User" class="rounded-circle w-100 h-100" style="object-fit: cover;">
+                            @else
+                                <div class="d-flex align-items-center justify-content-center w-100 h-100 bg-success text-white fw-bold rounded-circle">
+                                    {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
+                                </div>
+                            @endif
                         </div>
+                        <ul class="dropdown-menu dropdown-menu-end border-0 shadow mt-3">
+                            @if(Auth::user()->role === 'mahasiswa')
+                                <li><a class="dropdown-item" href="{{ route('profile.edit') }}">Profil Saya</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                            @endif
+                            <li>
+                                <a class="dropdown-item text-danger" href="{{ route('logout') }}"
+                                   onclick="event.preventDefault(); document.getElementById('logout-form-nav').submit();">
+                                    Logout
+                                </a>
+                                <form id="logout-form-nav" action="{{ route('logout') }}" method="POST" class="d-none">@csrf</form>
+                            </li>
+                        </ul>
                     </div>
                 </div>
+
             </nav>
 
             <div class="content-wrapper">
@@ -132,7 +135,20 @@
                 // Logika Mobile: Jika terbuka, dan klik di luar sidebar/tombol -> Tutup
                 if (isMobile && isToggled && !clickedInsideSidebar && !clickedToggle && !clickedDesktopToggle) {
                     body.classList.remove('sb-sidenav-toggled');
+                    localStorage.setItem('sb|sidebar-toggle', 'false'); // Perbarui state
                 }
+            });
+
+            // 4. [BARU] Menutup Sidebar Mobile saat klik link menu (kecuali toggle collapse)
+            const sidebarLinks = document.querySelectorAll('#sidebar-wrapper .list-group-item:not([data-bs-toggle="collapse"])');
+            sidebarLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    const isMobile = window.innerWidth < 992;
+                    if (isMobile) {
+                        body.classList.remove('sb-sidenav-toggled');
+                        localStorage.setItem('sb|sidebar-toggle', 'false'); // Agar navigasi halaman selanjutnya dimuat tertutup
+                    }
+                });
             });
         });
     </script>

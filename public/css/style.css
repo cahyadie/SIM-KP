@@ -221,9 +221,15 @@ a { text-decoration: none; color: inherit; transition: var(--transition-speed); 
    6. NAVBAR & CONTENT LAYOUT
    ========================================= */
 .top-navbar {
-    height: var(--header-height); background: white;
-    border-bottom: 1px solid var(--border-light); padding: 0 2rem;
-    display: flex; align-items: center; position: sticky; top: 0; z-index: 1020;
+    height: var(--header-height); 
+    background: white;
+    border-bottom: 1px solid var(--border-light); 
+    /* padding: 0 2rem; <-- HAPUS BARIS INI */
+    display: flex; 
+    align-items: center; 
+    position: sticky; 
+    top: 0; 
+    z-index: 1020;
     transition: all 0.3s ease;
 }
 .content-wrapper { padding: 2rem; }
