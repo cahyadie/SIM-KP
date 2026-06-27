@@ -35,6 +35,7 @@ class DosenController extends Controller
             }
 
             return [
+                'id' => $m->id,
                 'nama_mhs' => $m->mahasiswa->user->name,
                 'nim' => $m->mahasiswa->nim,
                 'perusahaan' => $m->perusahaan->nama_perusahaan,
@@ -82,7 +83,7 @@ class DosenController extends Controller
         return view('dosen.dashboard', compact('lokasi_magang', 'stat', 'marker_locations'));
     }
 
-   // =========================================================================
+    // =========================================================================
     // 2. BIMBINGAN: List Daftar Mahasiswa Bimbingan Aktif
     // =========================================================================
     public function bimbingan()
@@ -151,10 +152,23 @@ class DosenController extends Controller
         $pengajuanSkp = Magang::with(['mahasiswa.user', 'perusahaan'])
             ->where('dosen_id', $dosenId)
             ->where('status_validasi', 'diterima')
+            // Syarat lama: sudah selesai magang ATAU sudah mulai proses pengajuan jadwal
             ->where(function ($query) use ($hariIni) {
                 $query->where('tanggal_selesai', '<', $hariIni)
                     ->orWhere('status_jadwal_skp', '!=', 'belum');
             })
+            // SYARAT BARU: Filter jadwal yang sudah disetujui tapi tanggalnya sudah lewat
+            ->where(function ($query) use ($hariIni) {
+                // Tampilkan semua yang statusnya BUKAN disetujui (misal: menunggu, ditolak, belum)
+                $query->where('status_jadwal_skp', '!=', 'disetujui')
+                    // ATAU tampilkan yang disetujui, ASALKAN jadwal_terpilih belum lewat
+                    ->orWhere(function ($q) use ($hariIni) {
+                    $q->where('status_jadwal_skp', 'disetujui')
+                        ->where('jadwal_terpilih', '>=', $hariIni);
+                });
+            })
+            ->orderByRaw("CASE WHEN status_jadwal_skp = 'menunggu' THEN 1 ELSE 2 END ASC")
+            ->orderBy('tanggal_selesai', 'desc')
             ->orderBy('updated_at', 'desc')
             ->paginate(10);
 
@@ -226,39 +240,32 @@ class DosenController extends Controller
     }
 
     // =========================================================================
-    // 9. RIWAYAT MAGANG (Gabungan Pendaftaran & Selesai Khusus Dosen)
+    // 9. RIWAYAT MAGANG (Hanya Menampilkan yang Selesai SKP)
     // =========================================================================
     public function riwayatMagang(Request $request)
     {
         $dosenId = Auth::id();
         $bulan = $request->input('bulan');
         $tahun = $request->input('tahun');
-        $status = $request->input('status');
-        $search = $request->input('search'); // Tangkap input pencarian
-        $hariIni = \Carbon\Carbon::now();
+        $search = $request->input('search');
+        // (Status input dihapus karena sekarang hanya 1 status statis)
 
         // Tambahkan relasi 'dosen'
         $query = Magang::with(['mahasiswa.user', 'perusahaan', 'dosen'])
             ->where('dosen_id', $dosenId)
             ->where('status_validasi', 'diterima')
-            // KONDISI BARU: Hanya tampilkan yang Proses Seminar atau Selesai
-            ->where(function ($q) use ($hariIni) {
-                $q->where('status_skp', 'sudah') // Kondisi: Selesai
-                  ->orWhere(function ($subQ) use ($hariIni) {
-                      $subQ->where('status_skp', 'belum')
-                           ->where('tanggal_selesai', '<', $hariIni); // Kondisi: Proses Seminar
-                  });
-            });
+            // KONDISI BARU: HANYA TAMPILKAN YANG SUDAH SKP
+            ->where('status_skp', 'sudah');
 
         // Filter Pencarian (Search)
         if (!empty($search)) {
-            $query->where(function($q) use ($search) {
-                $q->whereHas('mahasiswa.user', function($qMhs) use ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->whereHas('mahasiswa.user', function ($qMhs) use ($search) {
                     $qMhs->where('name', 'like', "%{$search}%");
                 })
-                ->orWhereHas('perusahaan', function($qPT) use ($search) {
-                    $qPT->where('nama_perusahaan', 'like', "%{$search}%");
-                });
+                    ->orWhereHas('perusahaan', function ($qPT) use ($search) {
+                        $qPT->where('nama_perusahaan', 'like', "%{$search}%");
+                    });
             });
         }
 
@@ -266,19 +273,10 @@ class DosenController extends Controller
         if (!empty($bulan)) {
             $query->whereMonth('tanggal_mulai', $bulan);
         }
-        
+
         // Filter Tahun
         if (!empty($tahun)) {
             $query->whereYear('tanggal_mulai', $tahun);
-        }
-
-        // Filter Status (Opsi aktif dihapus karena sudah di-filter di query utama)
-        if (!empty($status)) {
-            if ($status == 'selesai') {
-                $query->where('status_skp', 'sudah');
-            } elseif ($status == 'seminar') {
-                $query->where('status_skp', 'belum')->where('tanggal_selesai', '<', $hariIni);
-            }
         }
 
         $riwayat = $query->orderBy('created_at', 'desc')->paginate(15);

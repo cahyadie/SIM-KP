@@ -208,16 +208,15 @@
                 </div>
             </div>
 
-            {{-- TABEL STATUS MAHASISWA (Sebelah Kanan) --}}
+            {{-- TABEL MAHASISWA AKTIF (Sebelah Kanan) --}}
             <div class="col-xl-8 col-lg-7">
                 <div class="card shadow-sm border-0 dashboard-card-height rounded-4 d-flex flex-column">
                     <div class="card-header bg-white py-3 border-bottom position-sticky top-0 d-flex justify-content-between align-items-center"
                         style="z-index: 2;">
                         <h6 class="mb-0 fw-bold text-primary">
-                            <i class="bi bi-activity me-2"></i> Status Mahasiswa Bimbingan
+                            <i class="bi bi-person-workspace me-2"></i> Mahasiswa Bimbingan Aktif
                         </h6>
-                        <a href="{{ route('dosen.bimbingan.index') }}" class="btn btn-sm btn-outline-secondary px-3">Lihat
-                            Semua</a>
+                        <a href="{{ route('dosen.bimbingan.index') }}" class="btn btn-sm btn-outline-secondary px-3">Lihat Semua</a>
                     </div>
                     <div class="card-body p-0 scrollable-card-body flex-grow-1">
                         <div class="table-responsive border-0">
@@ -227,45 +226,42 @@
                                         <th class="ps-4">MAHASISWA</th>
                                         <th>PERUSAHAAN</th>
                                         <th>DURASI MAGANG</th>
-                                        <th class="text-center">STATUS</th>
+                                        <th class="text-center">AKSI</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {{-- Filter: Sembunyikan yang statusnya sudah Selesai SKP agar tabel fokus ke yang
-                                    sedang berjalan --}}
-                                    @forelse(collect($lokasi_magang)->reject(fn($mhs) => str_contains($mhs['status'], 'Selesai')) as $mhs)
-                                        <tr>
+                                    {{-- Filter: HANYA tampilkan yang statusnya Aktif Magang --}}
+                                    @forelse(collect($lokasi_magang)->filter(fn($mhs) => $mhs['status'] == 'Aktif Magang') as $mhs)
+                                        <tr onclick="window.location='{{ route('dosen.bimbingan.detail', $mhs['id']) }}'" style="cursor: pointer;" title="Klik untuk lihat detail mahasiswa">
                                             <td class="ps-4 align-middle">
                                                 <div class="fw-bold text-dark">{{ $mhs['nama_mhs'] }}</div>
                                                 <div class="small text-muted">{{ $mhs['nim'] }}</div>
                                             </td>
                                             <td class="align-middle">
                                                 <div class="fw-bold text-dark text-truncate" style="max-width: 200px;">
-                                                    {{ $mhs['perusahaan'] }}</div>
+                                                    {{ $mhs['perusahaan'] }}
+                                                </div>
                                             </td>
                                             <td class="align-middle text-muted small">
                                                 {{ \Carbon\Carbon::parse($mhs['tanggal_mulai'])->format('d M y') }} - <br>
                                                 {{ \Carbon\Carbon::parse($mhs['tanggal_selesai'])->format('d M y') }}
                                             </td>
                                             <td class="text-center align-middle">
-                                                @if($mhs['status'] == 'Proses Seminar')
-                                                    <span class="badge bg-warning-soft text-warning rounded-pill px-3 py-1">Proses
-                                                        Seminar</span>
-                                                @else
-                                                    <span class="badge bg-primary-soft text-primary rounded-pill px-3 py-1">Aktif
-                                                        Magang</span>
-                                                @endif
+                                                <span class="badge bg-primary-soft text-primary rounded-pill px-3 py-1">
+                                                    Aktif Magang
+                                                </span>
+                                                <div class="mt-1 small">
+                                                    <span class="text-primary" style="font-size: 0.75rem;"><i class="bi bi-box-arrow-up-right me-1"></i>Detail</span>
+                                                </div>
                                             </td>
                                         </tr>
                                     @empty
                                         <tr>
                                             <td colspan="4" class="text-center py-5">
                                                 <div class="mb-3">
-                                                    <i class="bi bi-clipboard-data text-muted opacity-25"
-                                                        style="font-size: 3rem;"></i>
+                                                    <i class="bi bi-person-dash text-muted opacity-25" style="font-size: 3rem;"></i>
                                                 </div>
-                                                <h6 class="text-muted small">Belum ada data mahasiswa bimbingan yang aktif
-                                                    magang.</h6>
+                                                <h6 class="text-muted small">Belum ada data mahasiswa bimbingan yang aktif magang.</h6>
                                             </td>
                                         </tr>
                                     @endforelse
