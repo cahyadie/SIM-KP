@@ -73,7 +73,7 @@ class TestDataSeeder extends Seeder
         \DB::statement('SET FOREIGN_KEY_CHECKS=1');
 
         // ============================================================
-        // 1. USERS
+        // 1. USERS (Admin, Kaprodi, 3 Dosen)
         // ============================================================
         $admin = User::create([
             'name' => 'Administrator',
@@ -106,10 +106,13 @@ class TestDataSeeder extends Seeder
         }
 
         // ============================================================
-        // 2. MAHASISWA (20)
+        // 2. MAHASISWA (25 orang — semua punya 1 magang)
         // ============================================================
-        // Index:     0-4  Aktif,  5-7  SKP lulus,  8-12 Proses Seminar,
-        //           13-14 Belum Mulai,  15-16 Multi,  17-19 Tanpa Magang
+        $refDate = Carbon::create(2026, 6, 27);
+
+        // Index:  0-9  = Aktif Magang (Belum SKP)
+        //        10-19 = Selesai SKP
+        //        20-24 = Selesai Magang, Belum SKP >30 hari
         $dataMhs = [
             ['Aditya Pratama Nugroho', 'm1@test.com', '20240140001', '2024', '081234560001'],
             ['Bella Ramadhani Putri', 'm2@test.com', '20240140002', '2024', '081234560002'],
@@ -131,6 +134,11 @@ class TestDataSeeder extends Seeder
             ['Rina Fitriyani', 'm18@test.com', '20240140018', '2024', '081234560018'],
             ['Sandi Firmansyah Putra', 'm19@test.com', '20240140019', '2024', '081234560019'],
             ['Tari Lestari Dewi', 'm20@test.com', '20240140020', '2024', '081234560020'],
+            ['Umar Bakri Hidayat', 'm21@test.com', '20240140021', '2024', '081234560021'],
+            ['Vina Amalia Putri', 'm22@test.com', '20240140022', '2024', '081234560022'],
+            ['Wahyu Nugroho Saputra', 'm23@test.com', '20240140023', '2024', '081234560023'],
+            ['Xena Aulia Ramadhani', 'm24@test.com', '20240140024', '2024', '081234560024'],
+            ['Yoga Pratama Wardana', 'm25@test.com', '20240140025', '2024', '081234560025'],
         ];
 
         $mhsUsers = [];
@@ -177,58 +185,70 @@ class TestDataSeeder extends Seeder
         }
 
         // ============================================================
-        // 4. MAGANG
+        // 4. MAGANG — 25 records, 1 per mahasiswa
         // ============================================================
         // Dosen: 0=Agus Pratomo, 1=Sri Wahyuni, 2=Dimas Ardiyanto
         // Perush: 0=Nusantara TI, 1=Solusi Digital, 2=Bank Syariah,
         //         3=Inovasi Media, 4=Cloud DC Indonesia
 
-        $now = Carbon::now();
-
-        // ── M1–M5: Aktif Magang ──
+        // ── Grup A: 10 Aktif Magang, Belum SKP ── (idx 0-9)
+        // Mulai Jan-Mar 2026, selesai Sep-Dec 2026 (masih aktif)
         $aktifData = [
-            [0, 0, -2, 3, 'paid', 'Pengembangan Aplikasi Manajemen Inventaris'],
-            [1, 1, -1, 4, 'unpaid', 'Implementasi Sistem Monitoring Jaringan IoT'],
-            [2, 2, -3, 2, 'paid', 'Perancangan UI/UX Aplikasi Mobile Banking'],
-            [3, 0, -2, 1, 'unpaid', 'Sistem Informasi Manajemen Aset Digital'],
-            [4, 1, -1, 5, 'paid', 'Analisis Big Data untuk Rekomendasi Produk'],
+            [0, 0, 'paid', 'Pengembangan Aplikasi Manajemen Inventaris', '2026-01-01', '2026-09-30'],
+            [1, 1, 'unpaid', 'Implementasi Sistem Monitoring Jaringan IoT', '2026-01-15', '2026-10-15'],
+            [2, 2, 'paid', 'Perancangan UI/UX Aplikasi Mobile Banking', '2026-02-01', '2026-10-31'],
+            [3, 0, 'unpaid', 'Sistem Informasi Manajemen Aset Digital', '2026-02-10', '2026-11-10'],
+            [4, 1, 'paid', 'Analisis Big Data untuk Rekomendasi Produk', '2026-03-01', '2026-11-30'],
+            [0, 2, 'unpaid', 'Pengembangan REST API untuk Layanan Publik', '2026-01-05', '2026-12-05'],
+            [1, 0, 'paid', 'Optimasi Basis Data Perusahaan', '2026-01-20', '2026-12-20'],
+            [2, 1, 'unpaid', 'Aplikasi Multimedia Pembelajaran Interaktif', '2026-02-15', '2026-09-15'],
+            [3, 2, 'paid', 'Dashboard Analitik Bisnis Real-time', '2026-03-05', '2026-10-05'],
+            [4, 0, 'unpaid', 'Sistem IoT untuk Monitoring Lingkungan', '2026-03-20', '2026-11-20'],
         ];
 
-        for ($i = 0; $i < 5; $i++) {
+        for ($i = 0; $i < 10; $i++) {
             $d = $aktifData[$i];
             Magang::create([
                 'mahasiswa_id' => $mahasiswas[$i]->id,
                 'perusahaan_id' => $perusahaans[$d[0]]->id,
                 'dosen_id' => $dosen[$d[1]]->id,
-                'tanggal_mulai' => $now->copy()->addMonths($d[2])->startOfMonth()->toDateString(),
-                'tanggal_selesai' => $now->copy()->addMonths($d[3])->endOfMonth()->toDateString(),
-                'status_gaji' => $d[4],
-                'tema_magang' => $d[5],
+                'tanggal_mulai' => $d[4],
+                'tanggal_selesai' => $d[5],
+                'status_gaji' => $d[2],
+                'tema_magang' => $d[3],
                 'status_validasi' => 'diterima',
                 'status_skp' => 'belum',
                 'status_jadwal_skp' => 'belum',
             ]);
         }
 
-        // ── M6–M8: Selesai SKP ──
+        // ── Grup B: 10 Selesai SKP ── (idx 10-19)
+        // Mulai Jan-Mar 2026, selesai Apr-Jun 2026 (sebelum 27 Juni)
         $skpData = [
-            [0, 2, -10, -7, 'paid', 'Pengembangan REST API untuk Layanan Publik', 'A'],
-            [1, 0, -9, -6, 'unpaid', 'Optimasi Basis Data Perusahaan', 'B'],
-            [2, 1, -11, -8, 'paid', 'Aplikasi Multimedia Pembelajaran Interaktif', 'A'],
+            [0, 2, 'paid', 'Aplikasi Manajemen Proyek', '2026-01-01', '2026-04-30', 'A'],
+            [1, 0, 'unpaid', 'Redesain Website Portal Berita Desa', '2026-01-10', '2026-05-10', 'B'],
+            [2, 1, 'paid', 'Implementasi Modul Payment Gateway', '2026-02-01', '2026-05-15', 'A'],
+            [3, 2, 'unpaid', 'Sistem Informasi Pelayanan Klinik', '2026-02-15', '2026-05-31', 'B'],
+            [4, 0, 'paid', 'Sistem Informasi Geografis Pemetaan', '2026-03-01', '2026-06-01', 'A'],
+            [0, 1, 'unpaid', 'Pengembangan Fitur Chatbot Layanan', '2026-01-05', '2026-06-05', 'B'],
+            [1, 2, 'paid', 'Digitalisasi Arsip Pemerintahan Daerah', '2026-01-20', '2026-06-10', 'A'],
+            [2, 0, 'unpaid', 'Sistem Antrian Digital Berbasis IoT', '2026-02-10', '2026-06-15', 'B'],
+            [3, 1, 'paid', 'Pengembangan Aplikasi E-Learning', '2026-03-01', '2026-06-20', 'A'],
+            [4, 2, 'unpaid', 'Optimasi Jaringan Fiber Optik', '2026-03-15', '2026-06-25', 'B'],
         ];
 
-        for ($i = 0; $i < 3; $i++) {
+        for ($i = 0; $i < 10; $i++) {
             $d = $skpData[$i];
-            $idx = $i + 5;
-            $jadwal = $now->copy()->addMonths($d[3])->addMonth()->setTime(9, 0, 0);
+            $idx = $i + 10;
+            $jadwal = Carbon::parse($d[5])->subDays(7)->setTime(9, 0, 0);
             Magang::create([
                 'mahasiswa_id' => $mahasiswas[$idx]->id,
                 'perusahaan_id' => $perusahaans[$d[0]]->id,
                 'dosen_id' => $dosen[$d[1]]->id,
-                'tanggal_mulai' => $now->copy()->addMonths($d[2])->startOfMonth()->toDateString(),
-                'tanggal_selesai' => $now->copy()->addMonths($d[3])->endOfMonth()->toDateString(),
-                'status_gaji' => $d[4],
-                'tema_magang' => $d[5],
+                'tanggal_mulai' => $d[4],
+                'tanggal_selesai' => $d[5],
+                'status_gaji' => $d[2],
+                'tema_magang' => $d[3],
                 'status_validasi' => 'diterima',
                 'status_skp' => 'sudah',
                 'nilai_seminar' => $d[6],
@@ -238,106 +258,25 @@ class TestDataSeeder extends Seeder
             ]);
         }
 
-        // ── M9–M13: Proses Seminar ──
-        // M9 (8): selesai > 30 hari, blm ajukan jadwal
-        Magang::create([
-            'mahasiswa_id' => $mahasiswas[8]->id,
-            'perusahaan_id' => $perusahaans[3]->id,
-            'dosen_id' => $dosen[2]->id,
-            'tanggal_mulai' => $now->copy()->subMonths(8)->startOfMonth()->toDateString(),
-            'tanggal_selesai' => $now->copy()->subMonths(2)->endOfMonth()->toDateString(),
-            'status_gaji' => 'unpaid',
-            'tema_magang' => 'Sistem Informasi Pelayanan Klinik Kesehatan',
-            'status_validasi' => 'diterima',
-            'status_skp' => 'belum',
-            'status_jadwal_skp' => 'belum',
-        ]);
-
-        // M10 (9): selesai < 30 hari, blm ajukan jadwal
-        Magang::create([
-            'mahasiswa_id' => $mahasiswas[9]->id,
-            'perusahaan_id' => $perusahaans[4]->id,
-            'dosen_id' => $dosen[0]->id,
-            'tanggal_mulai' => $now->copy()->subMonths(5)->startOfMonth()->toDateString(),
-            'tanggal_selesai' => $now->copy()->subDays(7)->toDateString(),
-            'status_gaji' => 'paid',
-            'tema_magang' => 'Redesain Website Portal Berita Desa',
-            'status_validasi' => 'diterima',
-            'status_skp' => 'belum',
-            'status_jadwal_skp' => 'belum',
-        ]);
-
-        // M11 (10): jadwal menunggu approval
-        Magang::create([
-            'mahasiswa_id' => $mahasiswas[10]->id,
-            'perusahaan_id' => $perusahaans[0]->id,
-            'dosen_id' => $dosen[1]->id,
-            'tanggal_mulai' => $now->copy()->subMonths(7)->startOfMonth()->toDateString(),
-            'tanggal_selesai' => $now->copy()->subMonth()->endOfMonth()->toDateString(),
-            'status_gaji' => 'unpaid',
-            'tema_magang' => 'Pengembangan Sistem Antrian Digital',
-            'status_validasi' => 'diterima',
-            'status_skp' => 'belum',
-            'status_jadwal_skp' => 'menunggu',
-            'jadwal_opsi_1' => $now->copy()->addDays(5)->setTime(9, 0, 0)->toDateTimeString(),
-            'jadwal_opsi_2' => $now->copy()->addDays(6)->setTime(13, 0, 0)->toDateTimeString(),
-            'jadwal_opsi_3' => $now->copy()->addDays(8)->setTime(10, 0, 0)->toDateTimeString(),
-            'ruangan_skp' => 'Ruang Sidang Lt. 4',
-        ]);
-
-        // M12 (11): jadwal disetujui
-        Magang::create([
-            'mahasiswa_id' => $mahasiswas[11]->id,
-            'perusahaan_id' => $perusahaans[1]->id,
-            'dosen_id' => $dosen[2]->id,
-            'tanggal_mulai' => $now->copy()->subMonths(6)->startOfMonth()->toDateString(),
-            'tanggal_selesai' => $now->copy()->subMonths(2)->endOfMonth()->toDateString(),
-            'status_gaji' => 'paid',
-            'tema_magang' => 'Implementasi Modul Payment Gateway',
-            'status_validasi' => 'diterima',
-            'status_skp' => 'belum',
-            'status_jadwal_skp' => 'disetujui',
-            'jadwal_opsi_1' => $now->copy()->subMonth()->addDays(3)->setTime(9, 0, 0)->toDateTimeString(),
-            'jadwal_opsi_2' => $now->copy()->subMonth()->addDays(4)->setTime(13, 0, 0)->toDateTimeString(),
-            'jadwal_opsi_3' => $now->copy()->subMonth()->addDays(6)->setTime(10, 0, 0)->toDateTimeString(),
-            'jadwal_terpilih' => $now->copy()->addDays(14)->setTime(9, 0, 0)->toDateTimeString(),
-            'ruangan_skp' => 'Ruang Presentasi Lt. 2',
-        ]);
-
-        // M13 (12): jadwal ditolak
-        Magang::create([
-            'mahasiswa_id' => $mahasiswas[12]->id,
-            'perusahaan_id' => $perusahaans[2]->id,
-            'dosen_id' => $dosen[0]->id,
-            'tanggal_mulai' => $now->copy()->subMonths(7)->startOfMonth()->toDateString(),
-            'tanggal_selesai' => $now->copy()->subMonths(3)->endOfMonth()->toDateString(),
-            'status_gaji' => 'unpaid',
-            'tema_magang' => 'Sistem Informasi Geografis Pemetaan Wilayah',
-            'status_validasi' => 'diterima',
-            'status_skp' => 'belum',
-            'status_jadwal_skp' => 'ditolak',
-            'jadwal_opsi_1' => $now->copy()->subMonths(2)->addDays(3)->setTime(9, 0, 0)->toDateTimeString(),
-            'jadwal_opsi_2' => $now->copy()->subMonths(2)->addDays(4)->setTime(13, 0, 0)->toDateTimeString(),
-            'jadwal_opsi_3' => $now->copy()->subMonths(2)->addDays(6)->setTime(10, 0, 0)->toDateTimeString(),
-            'keterangan_tolak_jadwal' => 'Jadwal tidak sesuai dengan ketersediaan dosen pembimbing. Silakan ajukan ulang.',
-            'ruangan_skp' => 'Ruang Seminar Lt. 3',
-        ]);
-
-        // ── M14–M15: Belum Mulai ──
-        $belumMulaiData = [
-            [3, 1, 'paid', 'Pengembangan Aplikasi Manajemen Proyek'],
-            [4, 2, 'unpaid', 'Sistem IoT untuk Monitoring Lingkungan'],
+        // ── Grup C: 5 Selesai Magang, Belum SKP >30 hari ── (idx 20-24)
+        // Selesai sebelum 27 Mei 2026 (>30 hari sebelum 27 Juni)
+        $selesaiBlmSkpData = [
+            [0, 0, 'paid', 'Pengembangan Modul Inventaris', '2026-01-01', '2026-03-31'],
+            [1, 1, 'unpaid', 'Analisis Sentimen Media Sosial', '2026-01-15', '2026-04-15'],
+            [2, 2, 'unpaid', 'Aplikasi Pencatatan Keuangan Digital', '2026-02-01', '2026-04-30'],
+            [3, 0, 'paid', 'Sistem Manajemen Dokumen Elektronik', '2026-02-10', '2026-05-10'],
+            [4, 1, 'unpaid', 'Pengujian Keamanan Aplikasi Web', '2026-01-20', '2026-05-01'],
         ];
 
-        for ($i = 0; $i < 2; $i++) {
-            $d = $belumMulaiData[$i];
-            $idx = $i + 13;
+        for ($i = 0; $i < 5; $i++) {
+            $d = $selesaiBlmSkpData[$i];
+            $idx = $i + 20;
             Magang::create([
                 'mahasiswa_id' => $mahasiswas[$idx]->id,
                 'perusahaan_id' => $perusahaans[$d[0]]->id,
                 'dosen_id' => $dosen[$d[1]]->id,
-                'tanggal_mulai' => $now->copy()->addMonths($i + 1)->startOfMonth()->toDateString(),
-                'tanggal_selesai' => $now->copy()->addMonths($i + 4)->endOfMonth()->toDateString(),
+                'tanggal_mulai' => $d[4],
+                'tanggal_selesai' => $d[5],
                 'status_gaji' => $d[2],
                 'tema_magang' => $d[3],
                 'status_validasi' => 'diterima',
@@ -346,68 +285,8 @@ class TestDataSeeder extends Seeder
             ]);
         }
 
-        // ── M16: Multi Magang — 1 SKP + 1 Aktif ──
-        Magang::create([
-            'mahasiswa_id' => $mahasiswas[15]->id,
-            'perusahaan_id' => $perusahaans[4]->id,
-            'dosen_id' => $dosen[0]->id,
-            'tanggal_mulai' => $now->copy()->subMonths(13)->startOfMonth()->toDateString(),
-            'tanggal_selesai' => $now->copy()->subMonths(10)->endOfMonth()->toDateString(),
-            'status_gaji' => 'paid',
-            'tema_magang' => 'Analisis Kualitas Jaringan Fiber Optik',
-            'status_validasi' => 'diterima',
-            'status_skp' => 'sudah',
-            'nilai_seminar' => 'A',
-            'status_jadwal_skp' => 'disetujui',
-            'jadwal_terpilih' => $now->copy()->subMonths(9)->setTime(10, 0, 0)->toDateTimeString(),
-            'ruangan_skp' => 'Ruang Seminar Lt. 2',
-        ]);
-        Magang::create([
-            'mahasiswa_id' => $mahasiswas[15]->id,
-            'perusahaan_id' => $perusahaans[0]->id,
-            'dosen_id' => $dosen[0]->id,
-            'tanggal_mulai' => $now->copy()->subMonths(2)->startOfMonth()->toDateString(),
-            'tanggal_selesai' => $now->copy()->addMonths(2)->endOfMonth()->toDateString(),
-            'status_gaji' => 'unpaid',
-            'tema_magang' => 'Pengembangan Fitur Chatbot Layanan Pelanggan',
-            'status_validasi' => 'diterima',
-            'status_skp' => 'belum',
-            'status_jadwal_skp' => 'belum',
-        ]);
-
-        // ── M17: Multi Magang — 1 SKP + 1 Aktif ──
-        Magang::create([
-            'mahasiswa_id' => $mahasiswas[16]->id,
-            'perusahaan_id' => $perusahaans[3]->id,
-            'dosen_id' => $dosen[1]->id,
-            'tanggal_mulai' => $now->copy()->subMonths(12)->startOfMonth()->toDateString(),
-            'tanggal_selesai' => $now->copy()->subMonths(9)->endOfMonth()->toDateString(),
-            'status_gaji' => 'unpaid',
-            'tema_magang' => 'Digitalisasi Arsip Pemerintahan Daerah',
-            'status_validasi' => 'diterima',
-            'status_skp' => 'sudah',
-            'nilai_seminar' => 'B',
-            'status_jadwal_skp' => 'disetujui',
-            'jadwal_terpilih' => $now->copy()->subMonths(8)->setTime(11, 0, 0)->toDateTimeString(),
-            'ruangan_skp' => 'Ruang Seminar Lt. 3',
-        ]);
-        Magang::create([
-            'mahasiswa_id' => $mahasiswas[16]->id,
-            'perusahaan_id' => $perusahaans[1]->id,
-            'dosen_id' => $dosen[1]->id,
-            'tanggal_mulai' => $now->copy()->subMonth()->startOfMonth()->toDateString(),
-            'tanggal_selesai' => $now->copy()->addMonths(3)->endOfMonth()->toDateString(),
-            'status_gaji' => 'paid',
-            'tema_magang' => 'Dashboard Analitik Bisnis Real-time',
-            'status_validasi' => 'diterima',
-            'status_skp' => 'belum',
-            'status_jadwal_skp' => 'belum',
-        ]);
-
-        // M18–M20: Tanpa Magang — no records
-
         // ============================================================
-        // 5. LOGBOOKS
+        // 5. LOGBOOKS (untuk Grup A + Grup C — status_skp = 'belum')
         // ============================================================
         $buatLogbook = function ($magangId, $tglMulai, $jumlahMinggu, $accMingguTerakhir = null, $komentarAwal = null) {
             $keg = $this->kegiatan;
@@ -450,7 +329,11 @@ class TestDataSeeder extends Seeder
 
         $allMagang = Magang::where('status_validasi', 'diterima')->where('status_skp', 'belum')->get();
         foreach ($allMagang as $m) {
-            $weeks = max(1, Carbon::parse($m->tanggal_mulai)->diffInWeeks(Carbon::now()));
+            $mulai = Carbon::parse($m->tanggal_mulai);
+            $selesai = Carbon::parse($m->tanggal_selesai);
+            $now = Carbon::create(2026, 6, 27);
+
+            $weeks = max(1, $mulai->diffInWeeks(min($selesai, $now)));
             $buatLogbook($m->id, $m->tanggal_mulai, min($weeks, 5), $weeks >= 3 ? 2 : null, 'Catat setiap detail pekerjaan dengan rapi.');
         }
 

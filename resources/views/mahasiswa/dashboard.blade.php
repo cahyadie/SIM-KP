@@ -234,7 +234,7 @@
                         @if($magang->status_kegiatan == 'selesai')
                             Selesai Magang
                         @elseif($magang->status_kegiatan == 'skp')
-                            Tahap Seminar KP
+                            Belum SKP
                         @elseif($hari_ini->gt($tgl_selesai))
                             Selesai Magang
                         @elseif($magang->status_kegiatan == 'magang' || ($hari_ini->gte($tgl_mulai) && $hari_ini->lte($tgl_selesai)))
@@ -322,7 +322,7 @@
                                         $status_tampil = ucfirst($m->status_kegiatan);
 
                                         if ($m->status_kegiatan == 'skp') {
-                                            $status_tampil = 'Tahap Seminar KP';
+                                            $status_tampil = 'Belum SKP';
                                         } elseif ($m->status_kegiatan == 'selesai') {
                                             $status_tampil = 'Selesai Magang';
                                         } else {

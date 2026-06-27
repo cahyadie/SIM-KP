@@ -127,7 +127,7 @@
                                         $statusTxt = 'Selesai';
                                     } elseif ($m->status_kegiatan == 'skp') {
                                         $badgeColor = 'bg-warning text-dark';
-                                        $statusTxt = 'Tahap SKP';
+                                        $statusTxt = 'Belum SKP';
                                     } elseif ($hari_ini->gte($mulai) && $hari_ini->lte($selesai)) {
                                         $badgeColor = 'bg-success';
                                         $statusTxt = 'Aktif';

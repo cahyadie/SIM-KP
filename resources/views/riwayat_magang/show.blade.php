@@ -20,7 +20,7 @@
                 $icon = 'bi-check-circle';
             } elseif ($tglSelesai->isPast()) {
                 $statusColor = 'warning text-dark';
-                $statusText = 'Proses Seminar';
+                $statusText = 'Belum SKP';
                 $icon = 'bi-hourglass-split';
             } else {
                 $statusColor = 'primary';

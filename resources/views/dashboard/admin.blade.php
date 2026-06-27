@@ -179,7 +179,7 @@
                                     @if($skp->status_skp == 'sudah')
                                         <span class="badge bg-success-soft">Selesai</span>
                                     @else
-                                        <span class="badge bg-warning-soft">Proses</span>
+                                        <span class="badge bg-warning-soft">Belum SKP</span>
                                     @endif
                                 </div>
                             </div>

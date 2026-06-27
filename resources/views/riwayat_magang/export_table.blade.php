@@ -31,7 +31,7 @@
                 if ($p->status_skp == 'sudah') {
                     $statusText = 'Selesai (Lulus SKP)';
                 } elseif ($tglSelesai->isPast()) {
-                    $statusText = 'Proses Seminar';
+                    $statusText = 'Belum SKP';
                 } else {
                     $statusText = 'Aktif Magang';
                 }
