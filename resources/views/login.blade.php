@@ -21,8 +21,7 @@
         /* --- RIGHT PANEL (MENGGUNAKAN BACKGROUND GAMBAR) --- */
         .brand-panel {
             flex: 1;
-            /* Menggunakan overlay gradien gelap + fungsi asset() bawaan Laravel */
-            background:url("{{ asset('bg-kanan.png') }}");            
+            background:url("{{ asset('bg-kanan.jpg') }}");            
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;

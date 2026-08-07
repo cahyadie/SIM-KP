@@ -9,41 +9,29 @@ use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 
 class RiwayatMagangExport implements FromView, ShouldAutoSize
 {
-    protected $bulan;
-    protected $tahun;
-    protected $status;
-
-    public function __construct($bulan, $tahun, $status = null)
-    {
-        $this->bulan = $bulan;
-        $this->tahun = $tahun;
-        $this->status = $status;
-    }
+    public function __construct(
+        protected $bulan = null,
+        protected $tahun = null,
+        protected $status = null,
+    ) {}
 
     public function view(): View
     {
-        $hariIni = \Carbon\Carbon::now();
-        $query = Magang::with(['mahasiswa.user', 'perusahaan', 'dosen'])
-            ->where('status_validasi', 'diterima');
+        $riwayat = Magang::with(['mahasiswa.user', 'perusahaan', 'dosen'])
+            ->diterima()
+            ->when($this->bulan, fn ($query) => $query->whereMonth('tanggal_mulai', $this->bulan))
+            ->when($this->tahun, fn ($query) => $query->whereYear('tanggal_mulai', $this->tahun))
+            ->when($this->status, function ($query) {
+                match ($this->status) {
+                    'selesai' => $query->skpSudah(),
+                    'seminar' => $query->skpBelum()->where('tanggal_selesai', '<', now()),
+                    'aktif' => $query->skpBelum()->where('tanggal_selesai', '>=', now()),
+                    default => null,
+                };
+            })
+            ->orderBy('created_at', 'desc')
+            ->get();
 
-        if (!empty($this->bulan)) { $query->whereMonth('tanggal_mulai', $this->bulan); }
-        if (!empty($this->tahun)) { $query->whereYear('tanggal_mulai', $this->tahun); }
-        
-        if (!empty($this->status)) {
-            if ($this->status == 'selesai') {
-                $query->where('status_skp', 'sudah');
-            } elseif ($this->status == 'seminar') {
-                $query->where('status_skp', 'belum')->where('tanggal_selesai', '<', $hariIni);
-            } elseif ($this->status == 'aktif') {
-                $query->where('status_skp', 'belum')->where('tanggal_selesai', '>=', $hariIni);
-            }
-        }
-
-        $riwayat = $query->orderBy('created_at', 'desc')->get();
-
-        // Kita gunakan view khusus untuk Excel dan PDF secara seragam
-        return view('riwayat_magang.export_table', [
-            'riwayat' => $riwayat
-        ]);
+        return view('riwayat_magang.export_table', ['riwayat' => $riwayat]);
     }
 }

@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\User;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
@@ -12,8 +12,8 @@ class UserController extends Controller
     public function index()
     {
         $users = User::where('role', '!=', 'mahasiswa') // <--- LOGIKA UTAMA
-                     ->orderBy('created_at', 'desc')
-                     ->paginate(10);
+            ->orderBy('created_at', 'desc')
+            ->paginate(10);
 
         return view('admin.users.index', compact('users'));
     }

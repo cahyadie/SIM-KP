@@ -2,151 +2,90 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Magang;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
-use App\Models\Magang;
-use App\Models\Mahasiswa;
-use App\Models\User;
 
 class MahasiswaController extends Controller
 {
     public function dashboard()
     {
-        // 1. Ambil data mahasiswa yang sedang login
         $mahasiswa = Auth::user()->mahasiswa;
 
-        // 2. Cek apakah mahasiswa ada (safety check jika data belum lengkap)
-        if (!$mahasiswa) {
+        if (! $mahasiswa) {
             return redirect()->route('profile.edit')->with('warning', 'Silakan lengkapi profil terlebih dahulu.');
         }
 
-        // 3. Ambil RIWAYAT magang
-        // Mengambil semua magang milik mahasiswa ini, urutkan dari yang terbaru
-        // PERUBAHAN: Tambahkan relasi 'dosen' (sesuaikan dengan nama fungsi relasi di model Magang Anda)
-        $riwayat_magang = Magang::with(['perusahaan', 'dosen'])
-            ->where('mahasiswa_id', $mahasiswa->id)
-            ->orderBy('created_at', 'desc')
-            ->get();
+        $riwayat_magang = $this->riwayatQuery($mahasiswa->id)->get();
 
-        // 4. Ambil data magang AKTIF (paling baru) untuk keperluan widget di dashboard
-        $magang = $riwayat_magang->first();
-
-        // 5. Kirim ke View
-        return view('mahasiswa.dashboard', compact('mahasiswa', 'riwayat_magang', 'magang'));
+        return view('mahasiswa.dashboard', [
+            'mahasiswa' => $mahasiswa,
+            'riwayat_magang' => $riwayat_magang,
+            'magang' => $riwayat_magang->first(),
+        ]);
     }
 
-    /**
-     * Menampilkan Halaman Seminar (Form Input Nilai & Upload)
-     */
     public function seminar()
     {
         $mahasiswa = Auth::user()->mahasiswa;
 
-        // Cari data magang mahasiswa ini (karena pendaftaran otomatis 'diterima', data pasti langsung terbaca)
         $magang = Magang::where('mahasiswa_id', $mahasiswa->id)
-            ->where('status_validasi', 'diterima')
+            ->diterima()
             ->latest()
             ->first();
 
-        if (!$magang) {
+        if (! $magang) {
             return redirect()->route('mahasiswa.dashboard')->with('error', 'Anda belum terdaftar dalam program magang.');
         }
 
         return view('mahasiswa.seminar', compact('magang'));
     }
 
-    /**
-     * Memproses Simpan Nilai & Upload Berkas Seminar
-     */
-    /**
-     * Memproses Simpan Nilai & Upload Berkas Seminar (Langsung Terbit SKP)
-     */
     public function seminarStore(Request $request)
     {
-        $mahasiswa = Auth::user()->mahasiswa;
-
-        // 1. Ambil data magang yang aktif
-        $magang = Magang::where('mahasiswa_id', $mahasiswa->id)
-            ->where('status_validasi', 'diterima')
+        $magang = Magang::where('mahasiswa_id', Auth::user()->mahasiswa->id)
+            ->diterima()
             ->latest()
             ->firstOrFail();
 
-        // 2. VALIDASI INPUT
         $request->validate([
             'nilai_seminar' => 'required|in:A,B,C,D,E',
-            // Gunakan logika validasi: Wajib jika file belum ada di DB
             'file_seminar' => $magang->file_seminar ? 'nullable|mimes:pdf|max:5120' : 'required|mimes:pdf|max:5120',
         ]);
 
-        // 3. SIAPKAN DATA
         $dataUpdate = [
             'nilai_seminar' => $request->nilai_seminar,
-            'status_skp' => 'sudah', // <-- UBAH DI SINI: Langsung jadi 'sudah' agar SKP otomatis terbit
-            'keterangan_revisi' => null,    // Reset field revisi
+            'status_skp' => 'sudah',
+            'keterangan_revisi' => null,
         ];
 
-        // 4. UPLOAD FILE
         if ($request->hasFile('file_seminar')) {
-            // Hapus file lama jika ada
-            if ($magang->file_seminar && Storage::disk('public')->exists($magang->file_seminar)) {
-                Storage::disk('public')->delete($magang->file_seminar);
-            }
-            // Simpan file baru
-            $path = $request->file('file_seminar')->store('laporan_seminar', 'public');
-            $dataUpdate['file_seminar'] = $path;
+            $this->deleteStoredFile($magang->file_seminar);
+            $dataUpdate['file_seminar'] = $request->file('file_seminar')->store('laporan_seminar', 'public');
         }
 
-        // 5. EKSEKUSI UPDATE
         $magang->update($dataUpdate);
 
-        // Sesuaikan pesan balikan agar relevan dengan alur baru
         return redirect()->back()->with('success', 'Data seminar berhasil disimpan dan SKP telah diterbitkan!');
     }
 
     public function ajukanJadwal(Request $request)
     {
-        $mahasiswa = Auth::user()->mahasiswa;
-
-        $magang = Magang::where('mahasiswa_id', $mahasiswa->id)
-            ->where('status_validasi', 'diterima')
+        $magang = Magang::where('mahasiswa_id', Auth::user()->mahasiswa->id)
+            ->diterima()
             ->latest()
             ->firstOrFail();
 
-        // 1. Tambahkan validasi untuk file surat selesai magang
-        $opsiRules = [];
-        $opsiMessages = [];
-        for ($i = 1; $i <= 7; $i++) {
-            $rule = 'required|date|after:today';
-            for ($j = 1; $j < $i; $j++) {
-                $rule .= "|different:jadwal_opsi_{$j}";
-            }
-            $opsiRules["jadwal_opsi_{$i}"] = $rule;
-        }
-        $opsiRules['surat_selesai_magang'] = $magang->surat_selesai_magang ? 'nullable|mimes:pdf|max:2048' : 'required|mimes:pdf|max:2048';
+        $this->validateJadwalRequest($request, $magang);
 
-        $opsiMessages = [
-            'after' => 'Jadwal tidak boleh di masa lalu atau hari ini (harus minimal besok).'
-        ];
-        for ($i = 2; $i <= 7; $i++) {
-            $opsiMessages["jadwal_opsi_{$i}.different"] = "Opsi {$i} harus berbeda dengan opsi sebelumnya.";
-        }
-
-        $request->validate($opsiRules, $opsiMessages);
-
-        // 2. Proses upload file jika ada
         if ($request->hasFile('surat_selesai_magang')) {
-            // Hapus file lama jika ada (opsional)
-            if ($magang->surat_selesai_magang && Storage::disk('public')->exists($magang->surat_selesai_magang)) {
-                Storage::disk('public')->delete($magang->surat_selesai_magang);
-            }
-            // Simpan file baru
-            $pathSurat = $request->file('surat_selesai_magang')->store('surat_selesai', 'public');
-            $magang->surat_selesai_magang = $pathSurat;
+            $this->deleteStoredFile($magang->surat_selesai_magang);
+            $magang->surat_selesai_magang = $request->file('surat_selesai_magang')->store('surat_selesai', 'public');
         }
 
-        // 3. Update data jadwal
-        $dataUpdate = [
+        $magang->update([
             'jadwal_opsi_1' => $request->jadwal_opsi_1,
             'jadwal_opsi_2' => $request->jadwal_opsi_2,
             'jadwal_opsi_3' => $request->jadwal_opsi_3,
@@ -156,31 +95,23 @@ class MahasiswaController extends Controller
             'jadwal_opsi_7' => $request->jadwal_opsi_7,
             'status_jadwal_skp' => 'menunggu',
             'keterangan_tolak_jadwal' => null,
-            'surat_selesai_magang' => $magang->surat_selesai_magang // Simpan path surat
-        ];
-        $magang->update($dataUpdate);
+            'surat_selesai_magang' => $magang->surat_selesai_magang,
+        ]);
 
         return redirect()->back()->with('success', '7 Opsi jadwal (1 minggu) dan Surat Selesai Magang berhasil diajukan. Silakan tunggu persetujuan dari Dosen Pembimbing.');
     }
 
     public function riwayatMagang()
     {
-        $mahasiswa = Auth::user()->mahasiswa;
-
-        $riwayat_magang = Magang::with(['perusahaan', 'dosen'])
-            ->where('mahasiswa_id', $mahasiswa->id)
-            ->orderBy('created_at', 'desc')
-            ->get();
+        $riwayat_magang = $this->riwayatQuery(Auth::user()->mahasiswa->id)->get();
 
         return view('mahasiswa.riwayat_magang.index', compact('riwayat_magang'));
     }
 
     public function editMagang($id)
     {
-        $mahasiswa = Auth::user()->mahasiswa;
-
         $magang = Magang::with(['perusahaan', 'dosen'])
-            ->where('mahasiswa_id', $mahasiswa->id)
+            ->where('mahasiswa_id', Auth::user()->mahasiswa->id)
             ->findOrFail($id);
 
         $daftar_dosen = User::where('role', 'dosen')->orderBy('name')->get();
@@ -190,9 +121,7 @@ class MahasiswaController extends Controller
 
     public function updateMagang(Request $request, $id)
     {
-        $mahasiswa = Auth::user()->mahasiswa;
-
-        $magang = Magang::where('mahasiswa_id', $mahasiswa->id)->findOrFail($id);
+        $magang = Magang::where('mahasiswa_id', Auth::user()->mahasiswa->id)->findOrFail($id);
 
         $request->validate([
             'tanggal_mulai' => 'required|date',
@@ -202,15 +131,49 @@ class MahasiswaController extends Controller
             'dosen_id' => 'required|exists:users,id',
         ]);
 
-        $magang->update([
-            'tanggal_mulai' => $request->tanggal_mulai,
-            'tanggal_selesai' => $request->tanggal_selesai,
-            'tema_magang' => $request->tema_magang,
-            'status_gaji' => $request->status_gaji,
-            'dosen_id' => $request->dosen_id,
-        ]);
+        $magang->update($request->only('tanggal_mulai', 'tanggal_selesai', 'tema_magang', 'status_gaji', 'dosen_id'));
 
         return redirect()->route('mahasiswa.riwayat-magang.index')
             ->with('success', 'Data magang berhasil diperbarui.');
+    }
+
+    private function riwayatQuery(int $mahasiswaId)
+    {
+        return Magang::with(['perusahaan', 'dosen'])
+            ->where('mahasiswa_id', $mahasiswaId)
+            ->orderBy('created_at', 'desc');
+    }
+
+    private function validateJadwalRequest(Request $request, Magang $magang): void
+    {
+        $rules = [];
+        $messages = [
+            'after' => 'Jadwal tidak boleh di masa lalu atau hari ini (harus minimal besok).',
+        ];
+
+        for ($i = 1; $i <= 7; $i++) {
+            $different = collect(range(1, $i - 1))
+                ->map(fn ($j) => "different:jadwal_opsi_{$j}")
+                ->implode('|');
+
+            $rules["jadwal_opsi_{$i}"] = trim("required|date|after:today|{$different}", '|');
+
+            if ($i > 1) {
+                $messages["jadwal_opsi_{$i}.different"] = "Opsi {$i} harus berbeda dengan opsi sebelumnya.";
+            }
+        }
+
+        $rules['surat_selesai_magang'] = $magang->surat_selesai_magang
+            ? 'nullable|mimes:pdf|max:2048'
+            : 'required|mimes:pdf|max:2048';
+
+        $request->validate($rules, $messages);
+    }
+
+    private function deleteStoredFile(?string $path): void
+    {
+        if ($path && Storage::disk('public')->exists($path)) {
+            Storage::disk('public')->delete($path);
+        }
     }
 }

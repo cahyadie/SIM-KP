@@ -2,116 +2,80 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Models\Magang;
 use App\Models\Perusahaan;
 use App\Models\Review;
-use App\Models\Magang;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class ListPerusahaanController extends Controller
 {
-    // 1. Halaman Daftar Semua Perusahaan
     public function index(Request $request)
     {
         $role = Auth::user()->role ?? 'mahasiswa';
 
         $query = Perusahaan::withCount('reviews')
             ->withAvg('reviews', 'rating')
-            ->withCount(['magangs as total_alumni_count' => function ($query) {
-                $query->where('status_validasi', 'diterima');
-            }])
-            ->withExists(['magangs as has_paid' => function ($query) {
-                $query->where('status_gaji', 'paid')->where('status_validasi', 'diterima');
-            }])
-            ->withExists(['magangs as has_unpaid' => function ($query) {
-                $query->where('status_gaji', 'unpaid')->where('status_validasi', 'diterima');
-            }]);
+            ->withCount(['magangs as total_alumni_count' => fn ($q) => $q->diterima()])
+            ->withExists(['magangs as has_paid' => fn ($q) => $q->diterima()->where('status_gaji', 'paid')])
+            ->withExists(['magangs as has_unpaid' => fn ($q) => $q->diterima()->where('status_gaji', 'unpaid')]);
 
-        // Fitur Pencarian
-        if ($request->has('cari') && $request->cari != '') {
-            $keyword = $request->cari;
+        if ($keyword = $request->input('cari')) {
             $query->where(function ($q) use ($keyword) {
                 $q->where('nama_perusahaan', 'like', "%{$keyword}%")
-                  ->orWhere('kategori_industri', 'like', "%{$keyword}%")
-                  ->orWhere('alamat', 'like', "%{$keyword}%");
+                    ->orWhere('kategori_industri', 'like', "%{$keyword}%")
+                    ->orWhere('alamat', 'like', "%{$keyword}%");
             });
         }
 
-        // Fitur Filter Kategori
-        if ($request->has('kategori') && $request->kategori != '') {
+        if ($request->filled('kategori')) {
             $query->where('kategori_industri', $request->kategori);
         }
 
-        // Fitur Filter Tipe
-        if ($request->has('tipe') && $request->tipe != '') {
-            if ($request->tipe === 'paid') {
-                $query->whereHas('magangs', function ($q) {
-                    $q->where('status_gaji', 'paid')->where('status_validasi', 'diterima');
-                });
-            } elseif ($request->tipe === 'unpaid') {
-                $query->whereHas('magangs', function ($q) {
-                    $q->where('status_gaji', 'unpaid')->where('status_validasi', 'diterima');
-                })->whereDoesntHave('magangs', function ($q) {
-                    $q->where('status_gaji', 'paid')->where('status_validasi', 'diterima');
-                });
-            }
+        if ($request->filled('tipe')) {
+            $query->when($request->tipe === 'paid', fn ($q) => $q->whereHas('magangs', fn ($m) => $m->diterima()->where('status_gaji', 'paid')))
+                ->when($request->tipe === 'unpaid', fn ($q) => $q
+                    ->whereHas('magangs', fn ($m) => $m->diterima()->where('status_gaji', 'unpaid'))
+                    ->whereDoesntHave('magangs', fn ($m) => $m->diterima()->where('status_gaji', 'paid')));
         }
 
-        // Fitur Sortir Berdasarkan Rating
-        $sort = $request->query('sort');
+        $query->when($request->query('sort') === 'rating_tinggi', fn ($q) => $q->orderBy('reviews_avg_rating', 'desc'))
+            ->when($request->query('sort') === 'rating_terendah', fn ($q) => $q->orderBy('reviews_avg_rating', 'asc'))
+            ->when($request->query('sort') === 'mhs_terbanyak', fn ($q) => $q->orderBy('total_alumni_count', 'desc'))
+            ->when($request->query('sort') === 'mhs_tersedikit', fn ($q) => $q->orderBy('total_alumni_count', 'asc'))
+            ->when(! in_array($request->query('sort'), ['rating_tinggi', 'rating_terendah', 'mhs_terbanyak', 'mhs_tersedikit']), fn ($q) => $q->latest());
 
-if ($sort === 'rating_tinggi') {
-    $query->orderBy('reviews_avg_rating', 'desc');
-} elseif ($sort === 'rating_terendah') {
-    $query->orderBy('reviews_avg_rating', 'asc');
-} elseif ($sort === 'mhs_terbanyak') {
-    $query->orderBy('total_alumni_count', 'desc');
-} elseif ($sort === 'mhs_tersedikit') {
-    $query->orderBy('total_alumni_count', 'asc');
-} else {
-    $query->latest(); // Default
-}
-
-        $perusahaans = $query->paginate(10); 
+        $perusahaans = $query->paginate(10);
 
         return view('shared.perusahaan.index', compact('perusahaans', 'role'));
     }
 
-    // 2. Halaman Detail Perusahaan & Review
     public function show(Request $request, $id)
     {
-        $sort = $request->query('sort', 'terbaru'); 
+        $sort = $request->query('sort', 'terbaru');
 
         $perusahaan = Perusahaan::withCount('reviews')
             ->withAvg('reviews', 'rating')
-            // Cek riwayat paid/unpaid
-            ->withExists(['magangs as has_paid' => function ($query) {
-                $query->where('status_gaji', 'paid')->where('status_validasi', 'diterima');
-            }])
-            ->withExists(['magangs as has_unpaid' => function ($query) {
-                $query->where('status_gaji', 'unpaid')->where('status_validasi', 'diterima');
-            }])
+            ->withExists(['magangs as has_paid' => fn ($q) => $q->diterima()->where('status_gaji', 'paid')])
+            ->withExists(['magangs as has_unpaid' => fn ($q) => $q->diterima()->where('status_gaji', 'unpaid')])
             ->with([
                 'magangs',
                 'reviews' => function ($query) use ($sort) {
-                    if ($sort == 'tertinggi') {
-                        $query->orderBy('rating', 'desc')->orderBy('created_at', 'desc');
-                    } elseif ($sort == 'terendah') {
-                        $query->orderBy('rating', 'asc')->orderBy('created_at', 'desc');
-                    } else {
-                        $query->latest(); 
-                    }
+                    match ($sort) {
+                        'tertinggi' => $query->orderBy('rating', 'desc')->orderBy('created_at', 'desc'),
+                        'terendah' => $query->orderBy('rating', 'asc')->orderBy('created_at', 'desc'),
+                        default => $query->latest(),
+                    };
                 },
-                'reviews.mahasiswa.user'
+                'reviews.mahasiswa.user',
             ])->findOrFail($id);
-        
+
         $bisa_review = false;
-        if (Auth::user()->role == 'mahasiswa') {
-            $mhs_id = Auth::user()->mahasiswa->id ?? 0;
-            $bisa_review = Magang::where('mahasiswa_id', $mhs_id)
-                                 ->where('perusahaan_id', $id)
-                                 ->where('status_validasi', 'diterima')
-                                 ->exists();
+        if (Auth::user()->role === 'mahasiswa') {
+            $bisa_review = Magang::where('mahasiswa_id', Auth::user()->mahasiswa?->id ?? 0)
+                ->where('perusahaan_id', $id)
+                ->diterima()
+                ->exists();
         }
 
         return view('shared.perusahaan.show', compact('perusahaan', 'bisa_review', 'sort'));
@@ -119,16 +83,18 @@ if ($sort === 'rating_tinggi') {
 
     public function storeReview(Request $request, $id)
     {
+        abort_unless($mahasiswaId = Auth::user()->mahasiswa?->id, 403);
+
         $request->validate([
             'rating' => 'required|integer|min:1|max:5',
-            'komentar' => 'required|string|max:500'
+            'komentar' => 'required|string|max:500',
         ]);
 
         Review::create([
             'perusahaan_id' => $id,
-            'mahasiswa_id' => Auth::user()->mahasiswa->id,
+            'mahasiswa_id' => $mahasiswaId,
             'rating' => $request->rating,
-            'komentar' => $request->komentar
+            'komentar' => $request->komentar,
         ]);
 
         return back()->with('success', 'Terima kasih atas ulasan Anda!');
@@ -136,24 +102,18 @@ if ($sort === 'rating_tinggi') {
 
     public function destroyReview($id)
     {
-        if (Auth::user()->role == 'mahasiswa') {
-            abort(403, 'Anda tidak memiliki akses.');
-        }
+        abort_unless(Auth::user()->role === 'admin', 403);
 
-        $review = Review::findOrFail($id);
-        $review->delete();
+        Review::findOrFail($id)->delete();
 
         return back()->with('success', 'Review berhasil dihapus.');
     }
 
     public function destroyMagang($id)
     {
-        if (Auth::user()->role == 'mahasiswa') {
-            abort(403, 'Anda tidak memiliki akses.');
-        }
+        abort_unless(Auth::user()->role === 'admin', 403);
 
-        $magang = Magang::findOrFail($id);
-        $magang->delete();
+        Magang::findOrFail($id)->delete();
 
         return back()->with('success', 'Data riwayat magang berhasil dihapus.');
     }

@@ -2,18 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Pengumuman;
+use Illuminate\Http\Request;
 
 class PengumumanController extends Controller
 {
-    // =========================================================================
-    // A. BAGIAN ADMIN (Kelola Pengumuman CRUD)
-    // =========================================================================
-
+    // -------------------------------------------------------------------------
+    // KELOLA PENGAUMAN (Admin)
+    // -------------------------------------------------------------------------
     public function index()
     {
         $pengumuman = Pengumuman::latest()->paginate(10);
+
         return view('admin.pengumuman.index', compact('pengumuman'));
     }
 
@@ -24,12 +24,7 @@ class PengumumanController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'judul'            => 'required',
-            'deskripsi'        => 'required',
-            'link_pendaftaran' => 'required|url',
-            'deadline'         => 'nullable|date|after:today'
-        ]);
+        $request->validate($this->rules());
 
         Pengumuman::create($request->all());
 
@@ -37,29 +32,18 @@ class PengumumanController extends Controller
             ->with('success', 'Pengumuman lowongan berhasil ditambahkan!');
     }
 
-    public function showAdmin($id)
-    {
-        $pengumuman = Pengumuman::findOrFail($id);
-        return view('admin.pengumuman.show', compact('pengumuman'));
-    }
-
     public function edit($id)
     {
         $pengumuman = Pengumuman::findOrFail($id);
+
         return view('admin.pengumuman.edit', compact('pengumuman'));
     }
 
     public function update(Request $request, $id)
     {
-        $request->validate([
-            'judul'            => 'required',
-            'deskripsi'        => 'required',
-            'link_pendaftaran' => 'required|url',
-            'deadline'         => 'nullable|date|after:today'
-        ]);
+        $request->validate($this->rules());
 
-        $pengumuman = Pengumuman::findOrFail($id);
-        $pengumuman->update($request->all());
+        Pengumuman::findOrFail($id)->update($request->all());
 
         return redirect()->route('admin.pengumuman.index')
             ->with('success', 'Pengumuman berhasil diperbarui!');
@@ -68,63 +52,51 @@ class PengumumanController extends Controller
     public function destroy($id)
     {
         Pengumuman::destroy($id);
+
         return back()->with('success', 'Pengumuman berhasil dihapus!');
     }
 
-
-    // =========================================================================
-    // B. BAGIAN PUBLIK / MAHASISWA (Output Info Lowongan)
-    // =========================================================================
-
+    // -------------------------------------------------------------------------
+    // PUBLIK: INFO LOWONGAN
+    // -------------------------------------------------------------------------
     public function lowongan(Request $request)
     {
-        $query = Pengumuman::query();
-
-        // Filter Pencarian Teks (Berdasarkan Judul, Deskripsi, atau Lokasi)
-        if ($request->filled('search')) {
-            $search = $request->search;
-            $query->where(function($q) use ($search) {
-                $q->where('judul', 'like', "%{$search}%")
-                  ->orWhere('deskripsi', 'like', "%{$search}%")
-                  ->orWhere('lokasi', 'like', "%{$search}%");
-            });
-        }
-
-        // Filter Angkatan
-        if ($request->filled('angkatan')) {
-            $query->where('target_angkatan', 'like', "%{$request->angkatan}%");
-        }
-
-        // Filter Tipe Pendapatan (Paid / Unpaid) berdasarkan kolom info_gaji
-        if ($request->filled('tipe_pendapatan')) {
-            if ($request->tipe_pendapatan == 'paid') {
-                // Jika Paid, cari yang info_gaji-nya TIDAK null dan TIDAK kosong
-                $query->whereNotNull('info_gaji')->where('info_gaji', '!=', '');
-            } else if ($request->tipe_pendapatan == 'unpaid') {
-                // Jika Unpaid, cari yang info_gaji-nya null ATAU kosong
-                $query->where(function($q) {
+        $query = Pengumuman::query()
+            ->when($request->filled('search'), fn ($q) => $q->where(function ($q) use ($request) {
+                $q->where('judul', 'like', "%{$request->search}%")
+                    ->orWhere('deskripsi', 'like', "%{$request->search}%")
+                    ->orWhere('lokasi', 'like', "%{$request->search}%");
+            }))
+            ->when($request->filled('angkatan'), fn ($q) => $q->where('target_angkatan', 'like', "%{$request->angkatan}%"))
+            ->when($request->filled('tipe_pendapatan'), function ($q) use ($request) {
+                if ($request->tipe_pendapatan === 'paid') {
+                    $q->whereNotNull('info_gaji')->where('info_gaji', '!=', '');
+                } elseif ($request->tipe_pendapatan === 'unpaid') {
                     $q->whereNull('info_gaji')->orWhere('info_gaji', '');
-                });
-            }
-        }
+                }
+            });
 
-        // Pengurutan (Sorting)
-        if ($request->sort == 'terlama') {
-            $query->oldest();
-        } else {
-            $query->latest(); // Default: Terbaru (teratas)
-        }
+        $lowongan = $request->sort === 'terlama' ? $query->oldest() : $query->latest();
 
-        // Ubah paginate menjadi 10 agar proporsional untuk list memanjang (vertical)
-        $lowongan = $query->paginate(10); 
-        
-        return view('admin.pengumuman.lowongan', compact('lowongan'));
+        return view('admin.pengumuman.lowongan', [
+            'lowongan' => $lowongan->paginate(10),
+        ]);
     }
 
     public function showLowongan($id)
     {
-        $lowongan = Pengumuman::findOrFail($id);
-        $pengumuman = $lowongan;
-        return view('admin.pengumuman.show', compact('lowongan', 'pengumuman'));
+        $pengumuman = Pengumuman::findOrFail($id);
+
+        return view('admin.pengumuman.show', compact('pengumuman'));
+    }
+
+    private function rules(): array
+    {
+        return [
+            'judul' => 'required',
+            'deskripsi' => 'required',
+            'link_pendaftaran' => 'required|url',
+            'deadline' => 'nullable|date|after:today',
+        ];
     }
 }

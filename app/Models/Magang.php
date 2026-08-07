@@ -2,17 +2,16 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 class Magang extends Model
 {
     protected $appends = ['status_kegiatan'];
 
-    // Casting agar tanggal otomatis jadi object Carbon (mudah diformat)
     protected $casts = [
         'tanggal_mulai' => 'date',
         'tanggal_selesai' => 'date',
-        // Tambahan cast agar jadwal otomatis terbaca lengkap dengan jamnya
         'jadwal_opsi_1' => 'datetime',
         'jadwal_opsi_2' => 'datetime',
         'jadwal_opsi_3' => 'datetime',
@@ -40,8 +39,6 @@ class Magang extends Model
         'ruangan_skp',
         'surat_selesai_magang',
         'file_nilai_lapangan',
-
-        // --- KOLOM BARU UNTUK FITUR JADWAL SKP ---
         'status_jadwal_skp',
         'jadwal_opsi_1',
         'jadwal_opsi_2',
@@ -51,7 +48,7 @@ class Magang extends Model
         'jadwal_opsi_6',
         'jadwal_opsi_7',
         'jadwal_terpilih',
-        'keterangan_tolak_jadwal'
+        'keterangan_tolak_jadwal',
     ];
 
     public function mahasiswa()
@@ -69,26 +66,79 @@ class Magang extends Model
         return $this->hasMany(Logbook::class);
     }
 
-    // Relasi ke Dosen
     public function dosen()
     {
         return $this->belongsTo(User::class, 'dosen_id');
     }
 
-    public function getStatusKegiatanAttribute()
+    public function scopeDiterima(Builder $query): Builder
     {
-        $now = now()->startOfDay();
-        $selesai = $this->tanggal_selesai ? \Carbon\Carbon::parse($this->tanggal_selesai)->startOfDay() : null;
+        return $query->where('status_validasi', 'diterima');
+    }
 
+    public function scopeSkpBelum(Builder $query): Builder
+    {
+        return $query->where('status_skp', 'belum');
+    }
+
+    public function scopeSkpSudah(Builder $query): Builder
+    {
+        return $query->where('status_skp', 'sudah');
+    }
+
+    public function scopeGajiPaid(Builder $query): Builder
+    {
+        return $query->where('status_gaji', 'paid');
+    }
+
+    public function scopeGajiUnpaid(Builder $query): Builder
+    {
+        return $query->where('status_gaji', 'unpaid');
+    }
+
+    public function scopeSedangBerlangsung(Builder $query): Builder
+    {
+        return $query->diterima()->skpBelum()
+            ->whereDate('tanggal_mulai', '<=', now())
+            ->whereDate('tanggal_selesai', '>=', now());
+    }
+
+    public function scopeAktif(Builder $query): Builder
+    {
+        return $query->diterima()->skpBelum()
+            ->whereDate('tanggal_selesai', '>=', now());
+    }
+
+    public function scopeMenungguSkp(Builder $query): Builder
+    {
+        return $query->diterima()->skpBelum()
+            ->whereDate('tanggal_selesai', '<', now());
+    }
+
+    public function scopeLulusSkp(Builder $query): Builder
+    {
+        return $query->diterima()->skpSudah();
+    }
+
+    public function scopeBimbingan(Builder $query, int $dosenId): Builder
+    {
+        return $query->where('dosen_id', $dosenId);
+    }
+
+    public function getStatusKegiatanAttribute(): string
+    {
         if ($this->status_skp === 'sudah') {
             return 'selesai';
         }
-        if ($this->status_jadwal_skp === 'disetujui' || $this->status_jadwal_skp === 'menunggu') {
+
+        if (in_array($this->status_jadwal_skp, ['disetujui', 'menunggu'])) {
             return 'skp';
         }
-        if ($selesai && $now->greaterThan($selesai)) {
+
+        if ($this->tanggal_selesai && $this->tanggal_selesai->startOfDay()->isPast()) {
             return 'selesai';
         }
+
         return 'magang';
     }
 }

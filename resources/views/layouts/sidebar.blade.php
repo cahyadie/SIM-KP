@@ -124,7 +124,7 @@
 
                         @php 
                             $mhs = $user->mahasiswa;
-                            $aktif = $mhs?->magangs()->where('status_validasi', 'diterima')->latest()->first(); 
+                            $aktif = $mhs?->magangs()->diterima()->latest()->first(); 
                         @endphp
                         
                         @if($aktif)

@@ -8,8 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 class Pengumuman extends Model
 {
     use HasFactory;
-    
+
     protected $table = 'pengumuman';
+
     protected $guarded = ['id']; // Memperbolehkan semua kolom diisi kecuali ID
 
     protected $casts = [

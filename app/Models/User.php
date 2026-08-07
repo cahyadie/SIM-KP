@@ -54,9 +54,9 @@ class User extends Authenticatable
     {
         return $this->hasOne(Mahasiswa::class);
     }
-    
+
     // Relasi: User (jika dia Dosen) bisa membimbing banyak Magang
-    public function bimbingan() 
+    public function bimbingan()
     {
         return $this->hasMany(Magang::class, 'dosen_id');
     }
