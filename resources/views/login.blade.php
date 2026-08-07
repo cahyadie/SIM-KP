@@ -6,12 +6,12 @@
     <title>Login SIM-KP</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
             display: flex;
             min-height: 100vh;
             background: #f5f7fb;
@@ -125,7 +125,7 @@
         .input-group label .forgot-link {
             font-weight: 500;
             font-size: 12px;
-            color: #004b23;
+            color: #128B53;
             text-decoration: none;
         }
 
@@ -154,7 +154,7 @@
             border: 1.5px solid #e2e8f0;
             border-radius: 10px;
             font-size: 14px;
-            font-family: 'Inter', sans-serif;
+            font-family: 'Outfit', sans-serif;
             color: #0f172a;
             background: #f8fafc;
             transition: all 0.2s ease;
@@ -162,9 +162,9 @@
         }
 
         .input-wrapper input:focus {
-            border-color: #004b23;
+            border-color: #128B53;
             background: #ffffff;
-            box-shadow: 0 0 0 4px rgba(0, 75, 35, 0.1);
+            box-shadow: 0 0 0 4px rgba(18, 139, 83, 0.1);
         }
 
         .input-wrapper input::placeholder {
@@ -197,13 +197,13 @@
         .btn-primary {
             width: 100%;
             padding: 13px;
-            background: linear-gradient(135deg, #003318, #004b23);
+            background: linear-gradient(135deg, #0d6b3f, #128B53);
             color: white;
             border: none;
             border-radius: 10px;
             font-size: 15px;
             font-weight: 600;
-            font-family: 'Inter', sans-serif;
+            font-family: 'Outfit', sans-serif;
             cursor: pointer;
             transition: all 0.2s ease;
             margin-top: 4px;
@@ -213,7 +213,7 @@
 
         .btn-primary:hover {
             transform: translateY(-1px);
-            box-shadow: 0 8px 25px rgba(0, 51, 24, 0.3);
+            box-shadow: 0 8px 25px rgba(13, 107, 63, 0.3);
         }
 
         .btn-primary:active {
@@ -282,7 +282,7 @@
             border: 1.5px solid #e2e8f0;
             font-size: 14px;
             font-weight: 500;
-            font-family: 'Inter', sans-serif;
+            font-family: 'Outfit', sans-serif;
             transition: all 0.2s ease;
         }
 
@@ -310,7 +310,7 @@
         }
 
         .register-link a {
-            color: #004b23;
+            color: #128B53;
             font-weight: 600;
             text-decoration: none;
         }

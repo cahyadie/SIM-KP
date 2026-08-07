@@ -46,7 +46,7 @@
 
         .search-item:hover {
             background-color: #f8f9fa;
-            color: #004b23;
+            color: var(--primary-color);
         }
 
         .search-item:last-child {
@@ -103,7 +103,7 @@
                         </div>
                     @endif
 
-                    <form action="{{ route('magang.store') }}" method="POST" enctype="multipart/form-data">
+                    <form action="{{ route('mahasiswa.magang.store') }}" method="POST" enctype="multipart/form-data">
                         @csrf
 
                         <div class="row">

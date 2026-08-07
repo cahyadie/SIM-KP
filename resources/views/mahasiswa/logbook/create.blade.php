@@ -5,12 +5,12 @@
 @section('content')
     <div class="container">
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <a href="{{ route('logbook.index', $magang->id) }}" class="btn btn-outline-secondary shadow-sm px-3">
+            <a href="{{ route('mahasiswa.logbook.index', $magang->id) }}" class="btn btn-outline-secondary shadow-sm px-3">
                 <i class="bi bi-arrow-left me-1"></i> Kembali
             </a>
         </div>
 
-        <form action="{{ route('logbook.store', $magang->id) }}" method="POST">
+        <form action="{{ route('mahasiswa.logbook.store', $magang->id) }}" method="POST">
             @csrf
 
             <div class="card shadow-sm border-0 mb-4 rounded-4">

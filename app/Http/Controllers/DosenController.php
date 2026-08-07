@@ -70,7 +70,14 @@ class DosenController extends Controller
             'sudah_skp' => $bimbingan->where('status_skp', 'sudah')->count(),
         ];
 
-        return view('dosen.dashboard', compact('lokasi_magang', 'stat', 'marker_locations'));
+        $agendaSkp = Magang::with('mahasiswa.user')
+            ->where('dosen_id', $dosenId)
+            ->where('status_jadwal_skp', 'disetujui')
+            ->where('status_skp', 'belum')
+            ->orderBy('jadwal_terpilih', 'asc')
+            ->get();
+
+        return view('dosen.dashboard', compact('lokasi_magang', 'stat', 'marker_locations', 'agendaSkp'));
     }
 
     // -------------------------------------------------------------------------

@@ -5,7 +5,7 @@
 @section('content')
 <div class="container-fluid">
     <div class="d-flex align-items-center mb-4">
-        <a href="{{ route('admin.monitoring.index') }}" class="btn btn-outline-secondary btn-sm me-3 shadow-sm">
+        <a href="{{ route('kaprodi.monitoring.index') }}" class="btn btn-outline-secondary btn-sm me-3 shadow-sm">
             <i class="bi bi-arrow-left"></i> Kembali
         </a>
         <div>

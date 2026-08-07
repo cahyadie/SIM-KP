@@ -23,7 +23,7 @@
                                 placeholder="Cari berdasarkan nama mahasiswa, dosen, atau perusahaan..." 
                                 value="{{ request('search') }}" style="font-size: 0.95rem;">
                             <button class="btn text-white px-4 py-2" type="submit" 
-                                style="background-color: #014f31; border-radius: 0.3rem;">
+                                style="background-color: var(--primary-color); border-radius: 0.3rem;">
                                 Cari
                             </button>
                         </div>

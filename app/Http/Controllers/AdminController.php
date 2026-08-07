@@ -42,7 +42,7 @@ class AdminController extends Controller
             'logbooks' => fn ($query) => $query->orderBy('tgl_mulai', 'desc'),
         ])->findOrFail($id);
 
-        return view('admin.monitoring.detail', compact('magang'));
+        return view('monitoring.detail', compact('magang'));
     }
 
     // -------------------------------------------------------------------------

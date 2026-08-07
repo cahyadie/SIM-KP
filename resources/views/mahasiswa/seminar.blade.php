@@ -364,22 +364,6 @@
             background-color: #f8fafc;
         }
 
-        .bg-primary-soft {
-            background-color: #eff6ff;
-        }
-
-        .bg-success-soft {
-            background-color: #f0fdf4;
-        }
-
-        .bg-danger-soft {
-            background-color: #fef2f2;
-        }
-
-        .bg-success-subtle {
-            background-color: #d1e7dd !important;
-        }
-
         /* Typography & Effects */
         .tracking-wide {
             letter-spacing: 0.5px;

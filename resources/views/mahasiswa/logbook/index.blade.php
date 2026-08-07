@@ -18,7 +18,7 @@
                 <i class="bi bi-file-earmark-word me-1"></i> Unduh Evaluasi
             </a> -->
 
-            <a href="{{ route('logbook.create', $magang->id) }}" class="btn btn-primary shadow-sm">
+            <a href="{{ route('mahasiswa.logbook.create', $magang->id) }}" class="btn btn-primary shadow-sm">
                 <i class="bi bi-plus-lg me-1"></i> Isi Logbook
             </a>
         </div>

@@ -186,11 +186,11 @@
         const labels = @json($chartLabels);
         const dataValues = @json($chartValues);
 
-        let bgColors = 'rgba(0, 75, 35, 0.2)'; 
-        let borderColors = 'rgba(0, 75, 35, 1)'; 
+        let bgColors = 'rgba(18, 139, 83, 0.2)'; 
+        let borderColors = 'rgba(18, 139, 83, 1)'; 
 
         if (chartType === 'doughnut') {
-            bgColors = ['rgba(0, 75, 35, 0.8)', 'rgba(245, 158, 11, 0.8)']; 
+            bgColors = ['rgba(18, 139, 83, 0.8)', 'rgba(245, 158, 11, 0.8)']; 
             borderColors = ['#fff', '#fff'];
         }
 
@@ -215,12 +215,12 @@
                     legend: {
                         display: chartType === 'doughnut', 
                         position: 'bottom',
-                        labels: { font: { family: "'Inter', sans-serif" } }
+                        labels: { font: { family: "'Outfit', sans-serif" } }
                     },
                     tooltip: {
                         backgroundColor: 'rgba(15, 23, 42, 0.9)', 
-                        titleFont: { family: "'Inter', sans-serif", size: 13 },
-                        bodyFont: { family: "'Inter', sans-serif", size: 14 },
+                        titleFont: { family: "'Outfit', sans-serif", size: 13 },
+                        bodyFont: { family: "'Outfit', sans-serif", size: 14 },
                         padding: 12,
                         cornerRadius: 8
                     }
@@ -228,12 +228,12 @@
                 scales: chartType !== 'doughnut' ? {
                     y: {
                         beginAtZero: true,
-                        ticks: { stepSize: 1, font: { family: "'Inter', sans-serif" } },
+                        ticks: { stepSize: 1, font: { family: "'Outfit', sans-serif" } },
                         grid: { color: '#F1F5F9' }
                     },
                     x: {
                         grid: { display: false }, 
-                        ticks: { font: { family: "'Inter', sans-serif" } }
+                        ticks: { font: { family: "'Outfit', sans-serif" } }
                     }
                 } : {}
             }

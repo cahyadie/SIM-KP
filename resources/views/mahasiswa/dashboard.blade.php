@@ -6,18 +6,14 @@
 
     <style>
         :root {
-            --primary-color: #004b23;
-            --primary-light: #e8f5e9;
-            --primary-gradient: linear-gradient(135deg, #004b23, #007135);
+            --primary-color: #128B53;
+            --primary-light: #eaf5ee;
+            --primary-gradient: linear-gradient(135deg, #128B53, #0d6b3f);
             --success-light: #ecfdf3;
             --warning-light: #fff7ed;
             --dark-text: #111827;
             --muted-text: #6b7280;
             --border-color: #e5e7eb;
-        }
-
-        body {
-            background-color: #f8fafc;
         }
 
         .dashboard-card {
@@ -207,7 +203,7 @@
                     </div>
                 </div>
                 {{-- Tombol diarahkan ke form pendaftaran magang --}}
-                <a href="{{ route('magang.create') }}" class="btn btn-warning fw-bold text-dark px-4 shadow-sm rounded-pill">
+                <a href="{{ route('mahasiswa.magang.create') }}" class="btn btn-warning fw-bold text-dark px-4 shadow-sm rounded-pill">
                     Daftar Sekarang <i class="bi bi-arrow-right ms-1"></i>
                 </a>
             </div>
@@ -362,7 +358,7 @@
 
                                     @if($m->status_validasi == 'diterima')
 
-                                        <a href="{{ route('logbook.index', $m->id) }}"
+                                        <a href="{{ route('mahasiswa.logbook.index', $m->id) }}"
                                             class="btn btn-primary btn-sm rounded-3 px-3 shadow-sm">
                                             <i class="bi bi-journal-text me-1"></i> Logbook
                                         </a>

@@ -48,7 +48,7 @@
                                 @endif
                             </td>
                             <td class="text-center">
-                                <a href="{{ route('admin.monitoring.show', $m->id) }}" class="btn btn-sm btn-primary">
+                                <a href="{{ route('kaprodi.monitoring.show', $m->id) }}" class="btn btn-sm btn-primary">
                                     <i class="bi bi-eye"></i> Lihat Logbook
                                 </a>
                             </td>

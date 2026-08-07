@@ -2,19 +2,19 @@
    1. VARIABLES & RESET
    ========================================= */
 :root {
-    /* --- Brand Colors --- */
-    --primary-color: #004b23;
-    --primary-hover: #003318;
-    --primary-gradient: linear-gradient(135deg, #004b23 0%, #007135 100%);
+    /* --- Brand Colors (selaras dengan dashboard) --- */
+    --primary-color: #128B53;
+    --primary-hover: #0d6b3f;
+    --primary-gradient: linear-gradient(135deg, #128B53 0%, #0d6b3f 100%);
     --secondary-color: #64748B;
 
     /* --- Bootstrap Primary Override (ubah biru default jadi hijau) --- */
-    --bs-primary: #004b23;
-    --bs-primary-rgb: 0, 75, 35;
-    --bs-primary-bg-subtle: #e8f5e9;
-    --bs-link-color: #004b23;
-    --bs-link-hover-color: #003318;
-    
+    --bs-primary: #128B53;
+    --bs-primary-rgb: 18, 139, 83;
+    --bs-primary-bg-subtle: #eaf5ee;
+    --bs-link-color: #128B53;
+    --bs-link-hover-color: #0d6b3f;
+
     /* --- State Colors (Soft & Strong) --- */
     --success-bg: #DCFCE7; --success-text: #166534;
     --warning-bg: #FEF9C3; --warning-text: #854D0E;
@@ -22,12 +22,12 @@
     --info-bg: #E0F2FE;    --info-text: #075985;
 
     /* --- Backgrounds --- */
-    --bg-body: #F8FAFC;
+    --bg-body: #f8f9fa;
     --bg-card: #FFFFFF;
     --bg-sidebar: #FFFFFF;
 
     /* --- Typography --- */
-    --text-primary: #0F172A;
+    --text-primary: #1f2937;
     --text-secondary: #475569;
     --text-muted: #94A3B8;
 
@@ -37,22 +37,31 @@
     --header-height: 72px;
 
     /* --- Borders & Effects --- */
-    --border-light: #E2E8F0; /* Sedikit lebih gelap agar kontras form jelas */
-    --radius-sm: 8px;
-    --radius-md: 12px;
-    --radius-lg: 16px;
-    
+    --border-light: #E2E8F0;
+    --radius-sm: 10px;
+    --radius-md: 14px;
+    --radius-lg: 20px;
+
     --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
     --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
     --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
-    
+
     --transition-speed: 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+
+    /* --- Design System (Q-Component, selaras dashboard) --- */
+    --q-primary: #128B53;
+    --q-primary-soft: #eaf5ee;
+    --q-dark: #1f2937;
+    --q-muted: #9ca3af;
+    --q-bg: #f8f9fa;
+    --q-radius: 20px;
+    --q-shadow: 0 4px 24px rgba(0, 0, 0, 0.03);
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
-    font-family: 'Inter', sans-serif;
+    font-family: 'Outfit', sans-serif;
     background-color: var(--bg-body);
     color: var(--text-primary);
     font-size: 0.925rem; /* Ukuran font ideal untuk dashboard */
@@ -96,7 +105,7 @@ a { text-decoration: none; color: inherit; transition: var(--transition-speed); 
     width: 40px; height: 40px; background: var(--primary-gradient);
     border-radius: var(--radius-md); display: flex; align-items: center;
     justify-content: center; color: white; font-size: 1.25rem; flex-shrink: 0;
-    box-shadow: 0 4px 6px -1px rgba(0, 75, 35, 0.2);
+    box-shadow: 0 4px 6px -1px rgba(18, 139, 83, 0.2);
 }
 .logo-text { font-size: 1.2rem; font-weight: 700; white-space: nowrap; letter-spacing: -0.5px; }
 
@@ -132,7 +141,7 @@ a { text-decoration: none; color: inherit; transition: var(--transition-speed); 
 .list-group-item:hover i { color: var(--primary-color); transform: scale(1.1); }
 .list-group-item.active {
     background: var(--primary-gradient); color: white;
-    box-shadow: 0 4px 12px rgba(0, 75, 35, 0.3);
+    box-shadow: 0 4px 12px rgba(18, 139, 83, 0.3);
 }
 .list-group-item.active i { color: white; }
 
@@ -157,17 +166,17 @@ a { text-decoration: none; color: inherit; transition: var(--transition-speed); 
     body.sb-sidenav-toggled .logo-text,
     body.sb-sidenav-toggled .sidebar-label,
     body.sb-sidenav-toggled .list-group-item span,
-    body.sb-sidenav-toggled .list-group-item .bi-chevron-down, 
+    body.sb-sidenav-toggled .list-group-item .bi-chevron-down,
     body.sb-sidenav-toggled .btn-logout span,
     body.sb-sidenav-toggled .logo-wrapper { display: none !important; }
 
     body.sb-sidenav-toggled .sidebar-heading { padding: 0; justify-content: center; }
     body.sb-sidenav-toggled #sidebarToggle { margin: 0; }
-    
+
     /* Pusatkan posisi ikon pada menu utama */
     body.sb-sidenav-toggled .list-group-item {
-        justify-content: center !important; 
-        padding: 0.8rem 0 !important; 
+        justify-content: center !important;
+        padding: 0.8rem 0 !important;
         margin: 4px 10px;
         text-align: center;
     }
@@ -208,7 +217,7 @@ a { text-decoration: none; color: inherit; transition: var(--transition-speed); 
 @media (max-width: 991.98px) {
     #sidebar-wrapper { margin-left: calc(var(--sidebar-width) * -1); }
     #page-content-wrapper { margin-left: 0; }
-    
+
     body.sb-sidenav-toggled #sidebar-wrapper { margin-left: 0; box-shadow: var(--shadow-lg); }
     body.sb-sidenav-toggled::before {
         content: ""; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
@@ -221,14 +230,13 @@ a { text-decoration: none; color: inherit; transition: var(--transition-speed); 
    6. NAVBAR & CONTENT LAYOUT
    ========================================= */
 .top-navbar {
-    height: var(--header-height); 
+    height: var(--header-height);
     background: white;
-    border-bottom: 1px solid var(--border-light); 
-    /* padding: 0 2rem; <-- HAPUS BARIS INI */
-    display: flex; 
-    align-items: center; 
-    position: sticky; 
-    top: 0; 
+    border-bottom: 1px solid var(--border-light);
+    display: flex;
+    align-items: center;
+    position: sticky;
+    top: 0;
     z-index: 1020;
     transition: all 0.3s ease;
 }
@@ -240,7 +248,7 @@ a { text-decoration: none; color: inherit; transition: var(--transition-speed); 
     border: 2px solid var(--border-light); cursor: pointer;
     transition: all 0.2s;
 }
-.user-avatar:hover { border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(0, 75, 35, 0.1); }
+.user-avatar:hover { border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(18, 139, 83, 0.1); }
 .user-avatar img { width: 100%; height: 100%; object-fit: cover; }
 
 /* Dropdown Menu Customization */
@@ -256,13 +264,13 @@ a { text-decoration: none; color: inherit; transition: var(--transition-speed); 
 .dropdown-item.text-danger:hover { background-color: var(--danger-bg); }
 
 /* =========================================
-   7. COMPONENTS: CARDS
+   7. COMPONENTS: CARDS (selaras q-card dashboard)
    ========================================= */
 .card {
-    border: 1px solid var(--border-light);
-    border-radius: var(--radius-md);
+    border: none;
+    border-radius: var(--radius-lg);
     background-color: var(--bg-card);
-    box-shadow: var(--shadow-sm);
+    box-shadow: var(--q-shadow);
     transition: transform 0.2s, box-shadow 0.2s;
     overflow: hidden;
 }
@@ -275,7 +283,7 @@ a { text-decoration: none; color: inherit; transition: var(--transition-speed); 
 }
 
 .card-header {
-    background-color: transparent;
+    background-color: #ffffff;
     border-bottom: 1px solid var(--border-light);
     padding: 1.25rem 1.5rem;
     font-weight: 600;
@@ -289,6 +297,13 @@ a { text-decoration: none; color: inherit; transition: var(--transition-speed); 
     background-color: #FAFBFC;
     border-top: 1px solid var(--border-light);
     padding: 1rem 1.5rem;
+}
+
+/* Modal (selaras dengan gaya kartu) */
+.modal-content {
+    border: none;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
 }
 
 /* =========================================
@@ -313,14 +328,14 @@ a { text-decoration: none; color: inherit; transition: var(--transition-speed); 
 }
 .btn-primary:hover {
     background: var(--primary-hover);
-    box-shadow: 0 4px 6px rgba(0, 75, 35, 0.25);
+    box-shadow: 0 4px 6px rgba(18, 139, 83, 0.25);
     transform: translateY(-1px);
 }
 .btn-primary:focus-visible,
 .btn-check:focus-visible + .btn-primary {
     background-color: var(--primary-hover) !important;
     border-color: var(--primary-hover) !important;
-    box-shadow: 0 0 0 0.25rem rgba(0, 75, 35, 0.25) !important;
+    box-shadow: 0 0 0 0.25rem rgba(18, 139, 83, 0.25) !important;
 }
 .btn-check:checked + .btn-primary,
 .btn-check:active + .btn-primary,
@@ -388,7 +403,7 @@ a { text-decoration: none; color: inherit; transition: var(--transition-speed); 
 
 .form-control:focus, .form-select:focus {
     border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(0, 75, 35, 0.1);
+    box-shadow: 0 0 0 3px rgba(18, 139, 83, 0.1);
     outline: none;
 }
 
@@ -399,7 +414,7 @@ a { text-decoration: none; color: inherit; transition: var(--transition-speed); 
 }
 
 /* =========================================
-   10. COMPONENTS: TABLES
+   10. COMPONENTS: TABLES (selaras q-table dashboard)
    ========================================= */
 .table-responsive {
     border-radius: var(--radius-md);
@@ -407,27 +422,30 @@ a { text-decoration: none; color: inherit; transition: var(--transition-speed); 
     overflow: hidden;
 }
 
-.table { margin-bottom: 0; width: 100%; border-collapse: collapse; }
+.table { margin-bottom: 0; width: 100%; border-collapse: separate; border-spacing: 0; }
 
 .table thead th {
-    background-color: #F8FAFC;
-    color: var(--text-secondary);
+    background-color: #ffffff;
+    color: var(--q-muted);
     font-weight: 600;
     text-transform: uppercase;
-    font-size: 0.75rem;
-    letter-spacing: 0.05em;
+    font-size: 0.8rem;
+    letter-spacing: 0.02em;
     padding: 1rem 1.5rem;
     border-bottom: 1px solid var(--border-light);
     border-top: none;
+    white-space: nowrap;
 }
 
 .table tbody td {
     padding: 1rem 1.5rem;
     vertical-align: middle;
     color: var(--text-primary);
-    border-bottom: 1px solid var(--border-light);
+    border-bottom: 1px solid #f1f5f9;
     font-size: 0.9rem;
 }
+
+.table tbody tr:last-child td { border-bottom: none; }
 
 .table-hover tbody tr:hover { background-color: #FAFBFC; }
 
@@ -456,7 +474,7 @@ a { text-decoration: none; color: inherit; transition: var(--transition-speed); 
 .bg-warning-soft { background-color: var(--warning-bg); color: var(--warning-text); }
 .bg-danger-soft  { background-color: var(--danger-bg); color: var(--danger-text); }
 .bg-info-soft    { background-color: var(--info-bg); color: var(--info-text); }
-.bg-primary-soft { background-color: #e8f5e9; color: var(--primary-color); }
+.bg-primary-soft { background-color: #eaf5ee; color: var(--primary-color); }
 
 /* Alerts */
 .alert {
@@ -499,4 +517,287 @@ a { text-decoration: none; color: inherit; transition: var(--transition-speed); 
     .card-body { padding: 1rem; }
     .table thead { display: none; } /* Opsional: Table Cards layout di mobile */
     .btn { width: 100%; margin-bottom: 0.5rem; } /* Tombol full width di mobile */
+}
+
+/* =========================================
+   13. DESIGN SYSTEM (Q-COMPONENT)
+   Selaras dengan dashboard: kaprodi, admin, dosen
+   ========================================= */
+/* --- Cards --- */
+.q-card {
+    background: #ffffff;
+    border-radius: var(--q-radius);
+    border: none;
+    box-shadow: var(--q-shadow);
+    padding: 1.5rem;
+    transition: transform 0.2s ease;
+}
+
+.q-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.q-card-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--q-dark);
+    margin: 0;
+}
+
+/* --- Special Green Card --- */
+.q-card-green {
+    background: linear-gradient(135deg, #128B53 0%, #0d6b3f 100%);
+    color: white;
+    box-shadow: 0 8px 24px rgba(18, 139, 83, 0.25);
+}
+
+.q-card-green .q-card-title {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.q-card-green .stat-label {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.stat-value {
+    font-size: 2.2rem;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    margin: 0.5rem 0;
+}
+
+.stat-label {
+    font-size: 0.85rem;
+    color: var(--q-muted);
+}
+
+/* --- Badges & Pills --- */
+.q-badge {
+    background: var(--q-primary-soft);
+    color: var(--q-primary);
+    padding: 0.35rem 0.75rem;
+    border-radius: 50px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.q-badge-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 500;
+    font-size: 0.85rem;
+}
+
+.dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+
+/* --- Modern Nav Tabs --- */
+.q-nav-toggle {
+    background: #f1f5f9;
+    border-radius: 50px;
+    padding: 5px;
+    display: inline-flex;
+    gap: 5px;
+}
+
+.q-nav-toggle .nav-link {
+    border-radius: 50px;
+    color: var(--q-muted);
+    font-weight: 500;
+    border: none;
+    padding: 0.5rem 1.25rem;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+.q-nav-toggle .nav-link.active {
+    background: var(--q-primary);
+    color: white;
+    box-shadow: 0 4px 12px rgba(18, 139, 83, 0.2);
+}
+
+.q-nav-toggle .badge {
+    margin-left: 5px;
+    background: rgba(255, 255, 255, 0.2) !important;
+    color: inherit;
+}
+
+/* --- Tables --- */
+.q-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.q-table th {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    color: var(--q-muted);
+    font-weight: 600;
+    padding: 1rem 0.5rem;
+    background: #ffffff;
+    /* Wajib putih untuk sticky */
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+/* Garis bawah pada header (shadow trick agar sticky mulus) */
+.q-table th::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.q-table td {
+    padding: 1rem 0.5rem;
+    vertical-align: middle;
+    border-bottom: 1px solid #f1f5f9;
+    font-size: 0.9rem;
+}
+
+.q-table tr:last-child td {
+    border-bottom: none;
+}
+
+.q-table tbody tr:hover {
+    background: #fbfdfc;
+}
+
+.avatar-initial {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    background: var(--q-primary-soft);
+    color: var(--q-primary);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin-right: 10px;
+}
+
+/* --- Tombol aksi (ikon) --- */
+.q-btn-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: var(--q-primary-soft);
+    color: var(--q-primary);
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.95rem;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.q-btn-icon:hover {
+    background: var(--q-primary);
+    color: #ffffff;
+}
+
+/* --- Link aksi kecil --- */
+.q-link {
+    color: var(--q-primary);
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.q-link:hover {
+    color: var(--q-primary);
+    text-decoration: underline;
+}
+
+/* --- Chip tanggal (Agenda) --- */
+.date-chip {
+    flex-shrink: 0;
+    width: 55px;
+    border-radius: 12px;
+    overflow: hidden;
+    text-align: center;
+    border: 1px solid #eef2f6;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.date-chip .date-chip-month {
+    background: var(--q-primary);
+    color: #ffffff;
+    text-transform: uppercase;
+    font-size: 0.68rem;
+    font-weight: 700;
+    padding: 4px 0;
+    letter-spacing: 0.5px;
+}
+
+.date-chip .date-chip-day {
+    background: #ffffff;
+    color: var(--q-primary);
+    font-weight: 800;
+    font-size: 1.35rem;
+    padding: 4px 0;
+}
+
+/* --- CUSTOM SCROLLBAR UTILITIES --- */
+.custom-scroll {
+    max-height: 380px;
+    /* Pas untuk 5 Baris + Header */
+    overflow-y: auto;
+    padding-right: 5px;
+}
+
+/* Style scrollbar tipis ala UI Modern */
+.custom-scroll::-webkit-scrollbar {
+    width: 6px;
+}
+
+.custom-scroll::-webkit-scrollbar-track {
+    background: #f8f9fa;
+    border-radius: 10px;
+}
+
+.custom-scroll::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+}
+
+.custom-scroll::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+/* --- Map Chart Container --- */
+.chart-container {
+    position: relative;
+    height: 260px;
+    width: 100%;
+}
+
+/* Kontainer peta full-width */
+.map-box {
+    position: relative;
+    height: 400px;
+    width: 100%;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+#map {
+    height: 100%;
+    width: 100%;
+    border-radius: 12px;
+    z-index: 1;
 }

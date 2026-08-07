@@ -8,7 +8,7 @@
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
@@ -75,7 +75,7 @@
                         </div>
                         <ul class="dropdown-menu dropdown-menu-end border-0 shadow mt-3">
                             @if(Auth::user()->role === 'mahasiswa')
-                                <li><a class="dropdown-item" href="{{ route('profile.edit') }}">Profil Saya</a></li>
+                                <li><a class="dropdown-item" href="{{ route('mahasiswa.profile.edit') }}">Profil Saya</a></li>
                                 <li><hr class="dropdown-divider"></li>
                             @endif
                             <li>

@@ -104,9 +104,9 @@
                 <a href="#collapseMagangMhs" 
                    data-bs-toggle="collapse" 
                    role="button" 
-                   aria-expanded="{{ request()->routeIs('magang.create', 'logbook.*', 'mahasiswa.riwayat-magang.*') ? 'true' : 'false' }}" 
+                   aria-expanded="{{ request()->routeIs('mahasiswa.magang.create', 'mahasiswa.logbook.*', 'mahasiswa.riwayat-magang.*') ? 'true' : 'false' }}" 
                    aria-controls="collapseMagangMhs"
-                   class="list-group-item d-flex justify-content-between align-items-center {{ request()->routeIs('magang.create', 'logbook.*', 'mahasiswa.riwayat-magang.*') ? 'text-primary fw-bold' : '' }}">
+                   class="list-group-item d-flex justify-content-between align-items-center {{ request()->routeIs('mahasiswa.magang.create', 'mahasiswa.logbook.*', 'mahasiswa.riwayat-magang.*') ? 'text-primary fw-bold' : '' }}">
                     <div>
                         <i class="bi bi-journal-bookmark-fill"></i> <span>Magang</span>
                     </div>
@@ -114,11 +114,11 @@
                 </a>
 
                 {{-- ISI COLLAPSE MAGANG --}}
-                <div class="collapse {{ request()->routeIs('magang.create', 'logbook.*', 'mahasiswa.riwayat-magang.*') ? 'show' : '' }}" id="collapseMagangMhs">
+                <div class="collapse {{ request()->routeIs('mahasiswa.magang.create', 'mahasiswa.logbook.*', 'mahasiswa.riwayat-magang.*') ? 'show' : '' }}" id="collapseMagangMhs">
                     <div class="list-group list-group-flush bg-light">
-                        <a href="{{ route('magang.create') }}" 
-                           class="list-group-item ps-5 {{ request()->routeIs('magang.create') ? 'active' : '' }}"
-                           style="border-left: 3px solid transparent; {{ request()->routeIs('magang.create') ? 'border-left-color: var(--bs-primary);' : '' }}">
+                        <a href="{{ route('mahasiswa.magang.create') }}" 
+                           class="list-group-item ps-5 {{ request()->routeIs('mahasiswa.magang.create') ? 'active' : '' }}"
+                           style="border-left: 3px solid transparent; {{ request()->routeIs('mahasiswa.magang.create') ? 'border-left-color: var(--bs-primary);' : '' }}">
                             <i class="bi bi-pencil-square"></i> <span>Daftar Magang</span>
                         </a>
 
@@ -128,7 +128,7 @@
                         @endphp
                         
                         @if($aktif)
-                            <a href="{{ route('logbook.index', $aktif->id) }}" 
+                            <a href="{{ route('mahasiswa.logbook.index', $aktif->id) }}" 
                                class="list-group-item ps-5 {{ request()->routeIs('logbook.*') ? 'active' : '' }}"
                                style="border-left: 3px solid transparent; {{ request()->routeIs('logbook.*') ? 'border-left-color: var(--bs-primary);' : '' }}">
                                 <i class="bi bi-journal-text"></i> <span>Isi Logbook</span>
@@ -192,7 +192,7 @@
 
             {{-- PROFIL SAYA (Mahasiswa) --}}
             @if($role === 'mahasiswa')
-                <a href="{{ route('profile.edit') }}" class="list-group-item {{ request()->routeIs('profile.edit') ? 'active' : '' }}">
+                <a href="{{ route('mahasiswa.profile.edit') }}" class="list-group-item {{ request()->routeIs('mahasiswa.profile.edit') ? 'active' : '' }}">
                     <i class="bi bi-person-circle"></i> <span>Profil Saya</span>
                 </a>
             @endif

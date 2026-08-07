@@ -60,7 +60,7 @@
                     </div>
                 @endif
 
-                <form action="{{ route('profile.update') }}" method="POST">
+                <form action="{{ route('mahasiswa.profile.update') }}" method="POST">
                     @csrf
                     @method('PATCH')
 

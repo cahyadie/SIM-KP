@@ -14,7 +14,7 @@ class LogbookController extends Controller
         $user = Auth::user();
 
         if (! $user->mahasiswa) {
-            return redirect()->route('profile.edit')
+            return redirect()->route('mahasiswa.profile.edit')
                 ->with('error', 'Silakan lengkapi data profil mahasiswa terlebih dahulu.');
         }
 
@@ -44,7 +44,7 @@ class LogbookController extends Controller
         $tgl_selesai_magang = Carbon::parse($magang->tanggal_selesai);
 
         if ($tgl_mulai_minggu > $tgl_selesai_magang) {
-            return redirect()->route('logbook.index', $magang_id)
+            return redirect()->route('mahasiswa.logbook.index', $magang_id)
                 ->with('error', 'Semua logbook untuk periode magang ini sudah terisi penuh.');
         }
 
@@ -93,7 +93,7 @@ class LogbookController extends Controller
             'isi_logbook' => $request->log,
         ]);
 
-        return redirect()->route('logbook.index', $id)
+        return redirect()->route('mahasiswa.logbook.index', $id)
             ->with('success', 'Logbook mingguan berhasil disimpan!');
     }
 

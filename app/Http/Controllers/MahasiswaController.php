@@ -15,7 +15,7 @@ class MahasiswaController extends Controller
         $mahasiswa = Auth::user()->mahasiswa;
 
         if (! $mahasiswa) {
-            return redirect()->route('profile.edit')->with('warning', 'Silakan lengkapi profil terlebih dahulu.');
+            return redirect()->route('mahasiswa.profile.edit')->with('warning', 'Silakan lengkapi profil terlebih dahulu.');
         }
 
         $riwayat_magang = $this->riwayatQuery($mahasiswa->id)->get();

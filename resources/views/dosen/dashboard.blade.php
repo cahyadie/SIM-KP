@@ -4,291 +4,181 @@
 
 @section('styles')
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <style>
-        .icon-bg {
-            position: absolute;
-            right: -15px;
-            bottom: -15px;
-            font-size: 5.5rem;
-            opacity: 0.08;
-            transform: rotate(-15deg);
-            z-index: 0;
-        }
-
-        /* Penyesuaian shadow dan transisi halus */
-        .card-hover {
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-
-        .card-hover:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .08) !important;
-        }
-
-        /* --- KELAS LAYOUT BARU --- */
-        .dashboard-card-height {
-            height: 385px;
-        }
-
-        .scrollable-card-body {
-            overflow-y: auto;
-            scrollbar-width: none;
-            /* Firefox */
-            -ms-overflow-style: none;
-            /* IE/Edge */
-        }
-
-        .scrollable-card-body::-webkit-scrollbar {
-            display: none;
-            /* Chrome, Safari, Opera */
-        }
-
-        #map {
-            height: 360px;
-            width: 100%;
-            border-radius: var(--radius-md);
-            z-index: 1;
-            border: 1px solid var(--border-light);
-        }
-    </style>
 @endsection
 
 @section('content')
-    <div class="container-fluid px-4 py-3">
+    <div class="container-fluid py-4 px-xl-5">
 
-        {{-- 1. KARTU STATISTIK (4 Kolom) --}}
-        <div class="row g-3 mb-4">
+        {{-- BARIS 1: KARTU STATISTIK --}}
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-4 mb-4">
 
-            {{-- Total Bimbingan --}}
-            <div class="col-sm-6 col-xl-3">
-                <div class="card border-0 shadow-sm card-hover overflow-hidden h-100 rounded-4">
-                    <div class="card-body p-4 position-relative">
-                        <div class="d-flex align-items-center position-relative z-1">
-                            <div class="flex-shrink-0 bg-primary-soft p-3 rounded-4 text-primary">
-                                <i class="bi bi-people-fill fs-4"></i>
-                            </div>
-                            <div class="ms-3">
-                                <h6 class="text-uppercase text-muted small fw-bold mb-1" style="font-size:0.7rem;">Total
-                                    Bimbingan</h6>
-                                <h3 class="mb-0 fw-bold text-primary">{{ $stat['total'] }}</h3>
-                            </div>
+            {{-- Card 1: Total Bimbingan (Berwarna) --}}
+            <div class="col">
+                <div class="q-card q-card-green h-100 d-flex flex-column justify-content-between">
+                    <div>
+                        <div class="q-card-header mb-2">
+                            <span class="q-card-title text-white">Total Bimbingan</span>
+                            <i class="bi bi-people-fill opacity-75 fs-5"></i>
                         </div>
-                        <i class="bi bi-people-fill icon-bg text-primary"></i>
+                        <div class="stat-value text-white">{{ number_format($stat['total']) }}</div>
+                    </div>
+                    <div class="stat-label text-white mt-3 d-flex justify-content-between align-items-end">
+                        <span>Seluruh mahasiswa bimbingan</span>
                     </div>
                 </div>
             </div>
 
-            {{-- Sedang Magang --}}
-            <div class="col-sm-6 col-xl-3">
-                <div class="card border-0 shadow-sm card-hover overflow-hidden h-100 rounded-4">
-                    <div class="card-body p-4 position-relative">
-                        <div class="d-flex align-items-center position-relative z-1">
-                            <div class="flex-shrink-0 bg-info-soft p-3 rounded-4 text-info">
-                                <i class="bi bi-person-workspace fs-4"></i>
-                            </div>
-                            <div class="ms-3">
-                                <h6 class="text-uppercase text-muted small fw-bold mb-1" style="font-size:0.7rem;">Sedang
-                                    Magang</h6>
-                                <h3 class="mb-0 fw-bold text-info">{{ $stat['aktif'] }}</h3>
-                            </div>
+            {{-- Card 2: Aktif Magang --}}
+            <div class="col">
+                <div class="q-card h-100 d-flex flex-column justify-content-between">
+                    <div>
+                        <div class="q-card-header mb-2">
+                            <span class="q-card-title">Aktif Magang</span>
+                            <div class="q-badge"><i class="bi bi-briefcase"></i></div>
                         </div>
-                        <i class="bi bi-person-workspace icon-bg text-info"></i>
+                        <div class="stat-value text-dark">{{ number_format($stat['aktif']) }}</div>
+                    </div>
+                    <div class="stat-label mt-3 d-flex justify-content-between align-items-end">
+                        <span>Sedang berlangsung</span>
                     </div>
                 </div>
             </div>
 
-            {{-- Selesai Magang (Belum SKP) --}}
-            <div class="col-sm-6 col-xl-3">
-                <div class="card border-0 shadow-sm card-hover overflow-hidden h-100 rounded-4">
-                    <div class="card-body p-4 position-relative">
-                        <div class="d-flex align-items-center position-relative z-1">
-                            <div class="flex-shrink-0 bg-warning-soft p-3 rounded-4 text-warning text-dark">
-                                <i class="bi bi-hourglass-split fs-4"></i>
-                            </div>
-                            <div class="ms-3">
-                                <h6 class="text-uppercase text-muted small fw-bold mb-1" style="font-size:0.7rem;">Selesai
-                                    (Belum SKP)</h6>
-                                <h3 class="mb-0 fw-bold text-warning-emphasis">{{ $stat['selesai_magang'] }}</h3>
-                            </div>
+            {{-- Card 3: Selesai (Belum SKP) --}}
+            <div class="col">
+                <div class="q-card h-100 d-flex flex-column justify-content-between">
+                    <div>
+                        <div class="q-card-header mb-2">
+                            <span class="q-card-title">Selesai Magang</span>
+                            <div class="q-badge text-dark"><i class="bi bi-hourglass-split"></i></div>
                         </div>
-                        <i class="bi bi-hourglass-split icon-bg text-warning"></i>
+                        <div class="stat-value text-dark">{{ number_format($stat['selesai_magang']) }}</div>
                     </div>
+                    <div class="stat-label mt-3">Menunggu proses SKP</div>
                 </div>
             </div>
 
-            {{-- Sudah Lulus SKP --}}
-            <div class="col-sm-6 col-xl-3">
-                <div class="card border-0 shadow-sm card-hover overflow-hidden h-100 rounded-4">
-                    <div class="card-body p-4 position-relative">
-                        <div class="d-flex align-items-center position-relative z-1">
-                            <div class="flex-shrink-0 bg-success-soft p-3 rounded-4 text-success">
-                                <i class="bi bi-award-fill fs-4"></i>
-                            </div>
-                            <div class="ms-3">
-                                <h6 class="text-uppercase text-muted small fw-bold mb-1" style="font-size:0.7rem;">Sudah
-                                    Lulus SKP</h6>
-                                <h3 class="mb-0 fw-bold text-success">{{ $stat['sudah_skp'] }}</h3>
-                            </div>
+            {{-- Card 4: Lulus SKP --}}
+            <div class="col">
+                <div class="q-card h-100 d-flex flex-column justify-content-between">
+                    <div>
+                        <div class="q-card-header mb-2">
+                            <span class="q-card-title">Lulus SKP</span>
+                            <div class="q-badge"><i class="bi bi-mortarboard-fill"></i></div>
                         </div>
-                        <i class="bi bi-award-fill icon-bg text-success"></i>
+                        <div class="stat-value text-dark">{{ number_format($stat['sudah_skp']) }}</div>
                     </div>
+                    <div class="stat-label mt-3">Total mahasiswa selesai</div>
                 </div>
             </div>
 
         </div>
 
-        {{-- 2. BARIS KEDUA: AGENDA SKP & TABEL STATUS MAHASISWA --}}
+        {{-- BARIS 2: AGENDA SKP & MAHASISWA BIMBINGAN --}}
         <div class="row g-4 mb-4">
 
-            {{-- AGENDA SKP MENDATANG (Sebelah Kiri) --}}
-            <div class="col-xl-4 col-lg-5">
-                @php
-                    $agendaSkp = \App\Models\Magang::with('mahasiswa.user')
-                        ->where('dosen_id', Auth::id())
-                        ->where('status_jadwal_skp', 'disetujui')
-                        ->where('status_skp', 'belum')
-                        ->orderBy('jadwal_terpilih', 'asc')
-                        ->get();
-                @endphp
-
-                <div class="card shadow-sm border-0 dashboard-card-height rounded-4 d-flex flex-column">
-                    <div class="card-header bg-white py-3 border-bottom position-sticky top-0" style="z-index: 2;">
-                        <h6 class="mb-0 fw-bold text-primary">
-                            <i class="bi bi-calendar-event me-2"></i> Agenda SKP Terdekat
-                        </h6>
+            {{-- Agenda SKP Terdekat --}}
+            <div class="col-lg-4">
+                <div class="q-card h-100 d-flex flex-column" style="min-height: 420px;">
+                    <div class="q-card-header">
+                        <h5 class="fw-bold mb-0 text-dark"><i class="bi bi-calendar-event me-2"></i>Agenda SKP Terdekat</h5>
+                        <div class="q-badge"><i class="bi bi-calendar3"></i></div>
                     </div>
-                    <div class="card-body p-0 scrollable-card-body flex-grow-1">
-                        <div class="list-group list-group-flush">
-                            @forelse($agendaSkp as $agenda)
-                                <div class="list-group-item px-4 py-3 border-light card-hover">
-                                    <div class="d-flex align-items-center">
-
-                                        {{-- 1. IKON KALENDER SOBEK --}}
-                                        <div class="flex-shrink-0">
-                                            <div class="border border-primary text-center overflow-hidden shadow-sm"
-                                                style="width: 55px; border-radius: 12px;">
-                                                <div class="bg-primary text-white text-uppercase fw-bold"
-                                                    style="font-size: 0.7rem; padding: 4px 0;">
-                                                    {{ \Carbon\Carbon::parse($agenda->jadwal_terpilih)->translatedFormat('M') }}
-                                                </div>
-                                                <div class="bg-white text-primary fw-bolder fs-4 py-1">
-                                                    {{ \Carbon\Carbon::parse($agenda->jadwal_terpilih)->format('d') }}
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        {{-- 2. DETAIL MAHASISWA & WAKTU --}}
-                                        <div class="ms-3 flex-grow-1 overflow-hidden">
-                                            <h6 class="mb-1 fw-bold text-dark text-truncate">
-                                                {{ $agenda->mahasiswa->user->name ?? 'Mahasiswa' }}</h6>
-                                            <div class="d-flex flex-column gap-1 mt-1">
-                                                {{-- Hari & Tanggal Lengkap --}}
-                                                <div class="text-muted small d-flex align-items-center">
-                                                    <i class="bi bi-calendar3 me-2"></i>
-                                                    {{ \Carbon\Carbon::parse($agenda->jadwal_terpilih)->translatedFormat('l, d F Y') }}
-                                                </div>
-                                                {{-- Jam Pelaksanaan (Ditebalkan & Diberi Warna) --}}
-                                                <div class="text-primary small fw-bold d-flex align-items-center">
-                                                    <i class="bi bi-clock-fill me-2"></i>
-                                                    {{ \Carbon\Carbon::parse($agenda->jadwal_terpilih)->format('H:i') }} WIB
-                                                </div>
-                                            </div>
-                                        </div>
-
+                    <div class="custom-scroll flex-grow-1">
+                        @forelse($agendaSkp as $agenda)
+                            <div class="d-flex align-items-center py-3" style="border-bottom: 1px solid #f1f5f9;">
+                                <div class="date-chip">
+                                    <div class="date-chip-month">{{ \Carbon\Carbon::parse($agenda->jadwal_terpilih)->translatedFormat('M') }}</div>
+                                    <div class="date-chip-day">{{ \Carbon\Carbon::parse($agenda->jadwal_terpilih)->format('d') }}</div>
+                                </div>
+                                <div class="ms-3 flex-grow-1 overflow-hidden">
+                                    <h6 class="mb-1 fw-bold text-dark text-truncate">{{ $agenda->mahasiswa->user->name ?? 'Mahasiswa' }}</h6>
+                                    <div class="stat-label mb-1">
+                                        <i class="bi bi-calendar3 me-1"></i>{{ \Carbon\Carbon::parse($agenda->jadwal_terpilih)->translatedFormat('l, d F Y') }}
+                                    </div>
+                                    <div class="fw-bold" style="color: var(--q-primary); font-size: 0.8rem;">
+                                        <i class="bi bi-clock-fill me-1"></i>{{ \Carbon\Carbon::parse($agenda->jadwal_terpilih)->format('H:i') }} WIB
                                     </div>
                                 </div>
-                            @empty
-                                <div class="text-center py-5">
-                                    <i class="bi bi-calendar2-x text-muted opacity-25" style="font-size: 2.5rem;"></i>
-                                    <p class="text-muted small mb-0 mt-2">Belum ada agenda SKP.</p>
-                                </div>
-                            @endforelse
-                        </div>
+                            </div>
+                        @empty
+                            <div class="text-center py-5">
+                                <i class="bi bi-calendar2-x text-muted opacity-25" style="font-size: 2.5rem;"></i>
+                                <p class="text-muted small mb-0 mt-2">Belum ada agenda SKP.</p>
+                            </div>
+                        @endforelse
                     </div>
                 </div>
             </div>
 
-            {{-- TABEL MAHASISWA AKTIF (Sebelah Kanan) --}}
-            <div class="col-xl-8 col-lg-7">
-                <div class="card shadow-sm border-0 dashboard-card-height rounded-4 d-flex flex-column">
-                    <div class="card-header bg-white py-3 border-bottom position-sticky top-0 d-flex justify-content-between align-items-center"
-                        style="z-index: 2;">
-                        <h6 class="mb-0 fw-bold text-primary">
-                            <i class="bi bi-person-workspace me-2"></i> Mahasiswa Bimbingan Aktif
-                        </h6>
-                        <a href="{{ route('dosen.bimbingan.index') }}" class="btn btn-sm btn-outline-secondary px-3">Lihat Semua</a>
+            {{-- Mahasiswa Bimbingan Aktif --}}
+            <div class="col-lg-8">
+                <div class="q-card h-100 d-flex flex-column">
+                    <div class="q-card-header">
+                        <h5 class="fw-bold mb-0 text-dark"><i class="bi bi-person-workspace me-2"></i>Mahasiswa Bimbingan Aktif</h5>
+                        <a href="{{ route('dosen.bimbingan.index') }}" class="q-link"><i class="bi bi-arrow-right me-1"></i>Lihat Semua</a>
                     </div>
-                    <div class="card-body p-0 scrollable-card-body flex-grow-1">
-                        <div class="table-responsive border-0">
-                            <table class="table table-hover mb-0">
-                                <thead class="position-sticky top-0 bg-white shadow-sm" style="z-index: 1;">
-                                    <tr>
-                                        <th class="ps-4">MAHASISWA</th>
-                                        <th>PERUSAHAAN</th>
-                                        <th>DURASI MAGANG</th>
-                                        <th class="text-center">AKSI</th>
+                    <div class="custom-scroll flex-grow-1">
+                        <table class="q-table">
+                            <thead>
+                                <tr>
+                                    <th>Mahasiswa</th>
+                                    <th>Perusahaan</th>
+                                    <th>Durasi Magang</th>
+                                    <th class="text-end">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {{-- Filter: HANYA tampilkan yang statusnya Aktif Magang --}}
+                                @forelse(collect($lokasi_magang)->filter(fn($mhs) => $mhs['status'] == 'Aktif Magang') as $mhs)
+                                    <tr onclick="window.location='{{ route('dosen.bimbingan.detail', $mhs['id']) }}'" style="cursor: pointer;" title="Klik untuk lihat detail mahasiswa">
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="avatar-initial">{{ substr($mhs['nama_mhs'], 0, 1) }}</div>
+                                                <div>
+                                                    <div class="fw-bold text-dark">{{ $mhs['nama_mhs'] }}</div>
+                                                    <div class="stat-label">{{ $mhs['nim'] }}</div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="fw-medium text-dark text-truncate" style="max-width: 220px;">{{ $mhs['perusahaan'] }}</td>
+                                        <td class="stat-label">
+                                            {{ \Carbon\Carbon::parse($mhs['tanggal_mulai'])->format('d M y') }} -<br>
+                                            {{ \Carbon\Carbon::parse($mhs['tanggal_selesai'])->format('d M y') }}
+                                        </td>
+                                        <td class="text-end">
+                                            <span class="q-badge-status text-success">
+                                                <span class="dot bg-success"></span> Aktif Magang
+                                            </span>
+                                        </td>
                                     </tr>
-                                </thead>
-                                <tbody>
-                                    {{-- Filter: HANYA tampilkan yang statusnya Aktif Magang --}}
-                                    @forelse(collect($lokasi_magang)->filter(fn($mhs) => $mhs['status'] == 'Aktif Magang') as $mhs)
-                                        <tr onclick="window.location='{{ route('dosen.bimbingan.detail', $mhs['id']) }}'" style="cursor: pointer;" title="Klik untuk lihat detail mahasiswa">
-                                            <td class="ps-4 align-middle">
-                                                <div class="fw-bold text-dark">{{ $mhs['nama_mhs'] }}</div>
-                                                <div class="small text-muted">{{ $mhs['nim'] }}</div>
-                                            </td>
-                                            <td class="align-middle">
-                                                <div class="fw-bold text-dark text-truncate" style="max-width: 200px;">
-                                                    {{ $mhs['perusahaan'] }}
-                                                </div>
-                                            </td>
-                                            <td class="align-middle text-muted small">
-                                                {{ \Carbon\Carbon::parse($mhs['tanggal_mulai'])->format('d M y') }} - <br>
-                                                {{ \Carbon\Carbon::parse($mhs['tanggal_selesai'])->format('d M y') }}
-                                            </td>
-                                            <td class="text-center align-middle">
-                                                <span class="badge bg-primary-soft text-primary rounded-pill px-3 py-1">
-                                                    Aktif Magang
-                                                </span>
-                                                <div class="mt-1 small">
-                                                    <span class="text-primary" style="font-size: 0.75rem;"><i class="bi bi-box-arrow-up-right me-1"></i>Detail</span>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    @empty
-                                        <tr>
-                                            <td colspan="4" class="text-center py-5">
-                                                <div class="mb-3">
-                                                    <i class="bi bi-person-dash text-muted opacity-25" style="font-size: 3rem;"></i>
-                                                </div>
-                                                <h6 class="text-muted small">Belum ada data mahasiswa bimbingan yang aktif magang.</h6>
-                                            </td>
-                                        </tr>
-                                    @endforelse
-                                </tbody>
-                            </table>
-                        </div>
+                                @empty
+                                    <tr>
+                                        <td colspan="4" class="text-center py-5">
+                                            <div class="mb-3">
+                                                <i class="bi bi-person-dash text-muted opacity-25" style="font-size: 3rem;"></i>
+                                            </div>
+                                            <h6 class="text-muted small">Belum ada data mahasiswa bimbingan yang aktif magang.</h6>
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
 
         </div>
 
-        {{-- 3. BARIS KETIGA: PETA SEBARAN (Full Lebar) --}}
-        <div class="row">
+        {{-- BARIS 3: PETA SEBARAN --}}
+        <div class="row mb-5">
             <div class="col-12">
-                <div class="card shadow-sm border-0 rounded-4 overflow-hidden">
-                    <div class="card-header bg-white py-3 border-bottom">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <h6 class="mb-0 fw-bold text-primary">
-                                <i class="bi bi-map-fill me-2"></i> Sebaran Lokasi Magang Aktif
-                            </h6>
-                            <span class="badge bg-primary-soft text-primary px-3 py-1 rounded-pill">
-                                <i class="bi bi-broadcast me-1"></i> Live
-                            </span>
-                        </div>
+                <div class="q-card">
+                    <div class="q-card-header">
+                        <h5 class="fw-bold mb-0 text-dark"><i class="bi bi-map-fill me-2"></i>Sebaran Lokasi Magang Aktif</h5>
+                        <div class="q-badge"><i class="bi bi-broadcast me-1"></i>Live</div>
                     </div>
-                    <div class="card-body p-3 position-relative">
+                    <div class="map-box">
                         <div id="map"></div>
                     </div>
                 </div>
@@ -328,21 +218,18 @@
                         return;
                     }
 
-                    var iconToUse = blueIcon;
-                    var badgeColor = 'bg-primary';
-
                     var studentList = loc.nama_mhs.map(function (name) {
                         return '<div class="small text-secondary mb-1 fw-bold"><i class="bi bi-person-fill me-1"></i>' + name + '</div>';
                     }).join('');
 
-                    L.marker([loc.lat, loc.lng], { icon: iconToUse })
+                    L.marker([loc.lat, loc.lng], { icon: blueIcon })
                         .addTo(map)
                         .bindPopup(`
                             <div class="text-start p-1" style="min-width: 160px;">
                                 <h6 class="fw-bold mb-2 text-dark">${loc.perusahaan}</h6>
                                 ${studentList}
                                 <div class="mt-2">
-                                    <span class="badge ${badgeColor} rounded-pill px-2 py-1" style="font-size: 0.65rem;">
+                                    <span class="badge bg-primary rounded-pill px-2 py-1" style="font-size: 0.65rem;">
                                         ${loc.status}
                                     </span>
                                 </div>
