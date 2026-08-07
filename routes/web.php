@@ -8,6 +8,7 @@ use App\Http\Controllers\ListPerusahaanController;
 use App\Http\Controllers\LogbookController;
 use App\Http\Controllers\MagangController;
 use App\Http\Controllers\MahasiswaController;
+use App\Http\Controllers\NotifikasiController;
 use App\Http\Controllers\PengumumanController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
@@ -81,6 +82,11 @@ Route::middleware('auth')->group(function () {
 
         Route::get('/riwayat-magang', [DosenController::class, 'riwayatMagang'])->name('riwayat-magang.index');
         Route::get('/riwayat-magang/{id}', [DosenController::class, 'showRiwayat'])->name('riwayat-magang.show');
+
+        Route::get('/notifikasi', [NotifikasiController::class, 'index'])->name('notifikasi.index');
+        Route::get('/notifikasi/{id}/go', [NotifikasiController::class, 'go'])->name('notifikasi.go');
+        Route::post('/notifikasi/{id}/read', [NotifikasiController::class, 'read'])->name('notifikasi.read');
+        Route::post('/notifikasi/read-all', [NotifikasiController::class, 'readAll'])->name('notifikasi.read-all');
     });
 
     // KAPRODI

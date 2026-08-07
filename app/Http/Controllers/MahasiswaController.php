@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Magang;
 use App\Models\User;
+use App\Services\NotifikasiService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -68,6 +69,15 @@ class MahasiswaController extends Controller
 
         $magang->update($dataUpdate);
 
+        NotifikasiService::kirim(
+            $magang->dosen,
+            'selesai_seminar',
+            'Mahasiswa '.$magang->mahasiswa->user->name.' menyelesaikan seminar — SKP terbit',
+            route('dosen.riwayat-magang.index'),
+            'bi-award-fill',
+            $magang->id,
+        );
+
         return redirect()->back()->with('success', 'Data seminar berhasil disimpan dan SKP telah diterbitkan!');
     }
 
@@ -97,6 +107,16 @@ class MahasiswaController extends Controller
             'keterangan_tolak_jadwal' => null,
             'surat_selesai_magang' => $magang->surat_selesai_magang,
         ]);
+
+        NotifikasiService::kirim(
+            $magang->dosen,
+            'ajukan_jadwal',
+            'Mahasiswa '.$magang->mahasiswa->user->name.' mengajukan jadwal SKP & surat selesai magang',
+            route('dosen.skp.respon', $magang->id),
+            'bi-calendar2-week-fill',
+            $magang->id,
+            dedup: true,
+        );
 
         return redirect()->back()->with('success', '7 Opsi jadwal (1 minggu) dan Surat Selesai Magang berhasil diajukan. Silakan tunggu persetujuan dari Dosen Pembimbing.');
     }
@@ -152,13 +172,14 @@ class MahasiswaController extends Controller
         ];
 
         for ($i = 1; $i <= 7; $i++) {
-            $different = collect(range(1, $i - 1))
-                ->map(fn ($j) => "different:jadwal_opsi_{$j}")
-                ->implode('|');
-
-            $rules["jadwal_opsi_{$i}"] = trim("required|date|after:today|{$different}", '|');
+            $rules["jadwal_opsi_{$i}"] = 'required|date|after:today';
 
             if ($i > 1) {
+                $different = collect(range(1, $i - 1))
+                    ->map(fn ($j) => "different:jadwal_opsi_{$j}")
+                    ->implode('|');
+
+                $rules["jadwal_opsi_{$i}"] .= '|'.$different;
                 $messages["jadwal_opsi_{$i}.different"] = "Opsi {$i} harus berbeda dengan opsi sebelumnya.";
             }
         }

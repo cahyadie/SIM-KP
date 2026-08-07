@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Magang;
+use App\Services\NotifikasiService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -92,6 +93,15 @@ class LogbookController extends Controller
             'tgl_selesai' => $request->tgl_selesai,
             'isi_logbook' => $request->log,
         ]);
+
+        NotifikasiService::kirim(
+            $magang->dosen,
+            'logbook',
+            'Mahasiswa '.$magang->mahasiswa->user->name.' mengisi logbook Minggu Ke-'.$request->minggu_ke,
+            route('dosen.bimbingan.logbook', $magang->id),
+            'bi-journal-bookmark-fill',
+            $magang->id,
+        );
 
         return redirect()->route('mahasiswa.logbook.index', $id)
             ->with('success', 'Logbook mingguan berhasil disimpan!');

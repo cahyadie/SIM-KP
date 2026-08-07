@@ -6,6 +6,7 @@ use App\Models\Magang;
 use App\Models\Mahasiswa;
 use App\Models\Perusahaan;
 use App\Models\User;
+use App\Services\NotifikasiService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -31,7 +32,7 @@ class MagangController extends Controller
 
         $mahasiswa = Mahasiswa::where('user_id', Auth::id())->firstOrFail();
 
-        Magang::create([
+        $magang = Magang::create([
             'mahasiswa_id' => $mahasiswa->id,
             'dosen_id' => $request->dosen_id,
             'perusahaan_id' => $this->findOrCreatePerusahaan($request),
@@ -42,6 +43,16 @@ class MagangController extends Controller
             'status_validasi' => 'diterima',
             'file_surat_kaprodi' => $filePath,
         ]);
+
+        $dosen = User::find($request->dosen_id);
+        NotifikasiService::kirim(
+            $dosen,
+            'mulai_magang',
+            'Mahasiswa '.$mahasiswa->user->name.' mulai magang di '.$magang->perusahaan->nama_perusahaan,
+            route('dosen.bimbingan.detail', $magang->id),
+            'bi-rocket-takeoff-fill',
+            $magang->id,
+        );
 
         return redirect()->route('mahasiswa.dashboard')
             ->with('success', 'Pendaftaran berhasil! Anda sudah terdaftar dalam program magang.');

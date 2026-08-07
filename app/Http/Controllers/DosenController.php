@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Logbook;
 use App\Models\Magang;
+use App\Services\NotifikasiService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -15,6 +16,8 @@ class DosenController extends Controller
     // -------------------------------------------------------------------------
     public function index()
     {
+        NotifikasiService::kirimSelesaiMagang();
+
         $dosenId = Auth::id();
         $hariIni = Carbon::now();
 

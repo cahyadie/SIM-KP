@@ -56,6 +56,53 @@
                 </div>
 
                 <div class="d-flex align-items-center">
+                    @if(Auth::user()->role === 'dosen')
+                        @php
+                            $notifCount = Auth::user()->unreadNotifications()->count();
+                            $notifs = Auth::user()->unreadNotifications()->latest()->limit(10)->get();
+                        @endphp
+                        <div class="dropdown me-3">
+                            <div class="notification-bell" data-bs-toggle="dropdown" aria-expanded="false" title="Notifikasi">
+                                <i class="bi bi-bell"></i>
+                                @if($notifCount > 0)
+                                    <span class="notification-badge">{{ $notifCount > 99 ? '99+' : $notifCount }}</span>
+                                @endif
+                            </div>
+                            <div class="dropdown-menu dropdown-menu-end notification-dropdown border-0 shadow mt-3">
+                                <div class="d-flex justify-content-between align-items-center px-3 py-2 notification-header">
+                                    <span class="fw-bold">Notifikasi</span>
+                                    @if($notifCount > 0)
+                                        <form action="{{ route('dosen.notifikasi.read-all') }}" method="POST" class="d-inline">
+                                            @csrf
+                                            <button type="submit" class="btn btn-sm btn-link p-0 notification-readall">Tandai semua dibaca</button>
+                                        </form>
+                                    @endif
+                                </div>
+                                <div class="notification-scroll">
+                                    @forelse($notifs as $n)
+                                        @php $nData = (array) $n->data; @endphp
+                                        <a href="{{ route('dosen.notifikasi.go', $n->id) }}" class="notification-item">
+                                            <span class="notification-icon"><i class="bi {{ $nData['icon'] ?? 'bi-bell' }}"></i></span>
+                                            <span class="notification-body">
+                                                <span class="notification-text">{{ $nData['pesan'] ?? '' }}</span>
+                                                <span class="notification-time">{{ $n->created_at->diffForHumans() }}</span>
+                                            </span>
+                                            @if(is_null($n->read_at))
+                                                <span class="notification-dot"></span>
+                                            @endif
+                                        </a>
+                                    @empty
+                                        <div class="notification-empty">
+                                            <i class="bi bi-bell-slash"></i>
+                                            <span>Belum ada notifikasi</span>
+                                        </div>
+                                    @endforelse
+                                </div>
+                                <a href="{{ route('dosen.notifikasi.index') }}" class="notification-footer">Lihat Semua Notifikasi</a>
+                            </div>
+                        </div>
+                    @endif
+
                     <div class="user-info d-none d-md-block me-3 text-end">
                         <div class="fw-bold small">{{ Auth::user()->name }}</div>
                         <span class="badge bg-primary-subtle text-primary rounded-pill" style="font-size: 0.7rem;">
