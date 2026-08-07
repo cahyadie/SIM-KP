@@ -61,9 +61,14 @@
                 <label class="form-label fw-bold">Target Mahasiswa</label>
                 <input type="text" name="target_angkatan" class="form-control" placeholder="Cth: Ini khusus mahasiswa 2022" value="{{ old('target_angkatan') }}">
             </div>
-            <div class="mb-4">
+            <div class="mb-3">
                 <label class="form-label fw-bold">Link Pendaftaran <span class="text-danger">*</span></label>
                 <input type="url" name="link_pendaftaran" class="form-control" placeholder="Cth: https://docs.google.com/..." value="{{ old('link_pendaftaran') }}" required>
+            </div>
+            <div class="mb-4">
+                <label class="form-label fw-bold">Batas Pendaftaran (Deadline)</label>
+                <input type="date" name="deadline" class="form-control" value="{{ old('deadline') }}">
+                <small class="text-muted">Tanggal terakhir pendaftaran lowongan ini.</small>
             </div>
             
             <button type="submit" class="btn btn-primary w-100">Sebarkan Pengumuman</button>

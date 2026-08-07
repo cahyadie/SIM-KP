@@ -16,6 +16,10 @@ class Magang extends Model
         'jadwal_opsi_1' => 'datetime',
         'jadwal_opsi_2' => 'datetime',
         'jadwal_opsi_3' => 'datetime',
+        'jadwal_opsi_4' => 'datetime',
+        'jadwal_opsi_5' => 'datetime',
+        'jadwal_opsi_6' => 'datetime',
+        'jadwal_opsi_7' => 'datetime',
         'jadwal_terpilih' => 'datetime',
     ];
 
@@ -42,6 +46,10 @@ class Magang extends Model
         'jadwal_opsi_1',
         'jadwal_opsi_2',
         'jadwal_opsi_3',
+        'jadwal_opsi_4',
+        'jadwal_opsi_5',
+        'jadwal_opsi_6',
+        'jadwal_opsi_7',
         'jadwal_terpilih',
         'keterangan_tolak_jadwal'
     ];

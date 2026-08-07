@@ -47,6 +47,17 @@
                             <div class="text-muted small text-uppercase fw-bold mb-1" style="font-size: 0.7rem; letter-spacing: 0.5px;">Diposting</div>
                             <div class="fw-medium text-dark small"><i class="bi bi-calendar-event text-warning me-1"></i> {{ $pengumuman->created_at->format('d M Y') }}</div>
                         </div>
+                        @if($pengumuman->deadline)
+                            <div class="text-center px-3 border-start">
+                                <div class="text-muted small text-uppercase fw-bold mb-1" style="font-size: 0.7rem; letter-spacing: 0.5px;">Deadline</div>
+                                <div class="fw-medium small {{ $pengumuman->deadline->isPast() ? 'text-danger' : 'text-dark' }}">
+                                    <i class="bi bi-hourglass-split me-1"></i> {{ $pengumuman->deadline->format('d M Y') }}
+                                    @if($pengumuman->deadline->isPast())
+                                        <span class="badge bg-danger ms-1" style="font-size: 0.6rem;">Tutup</span>
+                                    @endif
+                                </div>
+                            </div>
+                        @endif
                     </div>
 
                     {{-- Deskripsi Penuh --}}

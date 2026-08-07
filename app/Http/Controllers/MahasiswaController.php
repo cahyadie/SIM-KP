@@ -114,18 +114,25 @@ class MahasiswaController extends Controller
             ->firstOrFail();
 
         // 1. Tambahkan validasi untuk file surat selesai magang
-        $request->validate([
-            'jadwal_opsi_1' => 'required|date|after:today',
-            'jadwal_opsi_2' => 'required|date|after:today|different:jadwal_opsi_1',
-            'jadwal_opsi_3' => 'required|date|after:today|different:jadwal_opsi_1|different:jadwal_opsi_2',
-            // 'ruangan_skp' => 'required|string|max:255',
-            // Jika file sudah pernah diupload (misal jadwal ditolak dan ajukan ulang), file tidak wajib. Jika belum, wajib.
-            'surat_selesai_magang' => $magang->surat_selesai_magang ? 'nullable|mimes:pdf|max:2048' : 'required|mimes:pdf|max:2048',
-        ], [
-            'jadwal_opsi_2.different' => 'Opsi 2 harus berbeda dengan Opsi 1.',
-            'jadwal_opsi_3.different' => 'Opsi 3 harus berbeda dengan opsi lainnya.',
+        $opsiRules = [];
+        $opsiMessages = [];
+        for ($i = 1; $i <= 7; $i++) {
+            $rule = 'required|date|after:today';
+            for ($j = 1; $j < $i; $j++) {
+                $rule .= "|different:jadwal_opsi_{$j}";
+            }
+            $opsiRules["jadwal_opsi_{$i}"] = $rule;
+        }
+        $opsiRules['surat_selesai_magang'] = $magang->surat_selesai_magang ? 'nullable|mimes:pdf|max:2048' : 'required|mimes:pdf|max:2048';
+
+        $opsiMessages = [
             'after' => 'Jadwal tidak boleh di masa lalu atau hari ini (harus minimal besok).'
-        ]);
+        ];
+        for ($i = 2; $i <= 7; $i++) {
+            $opsiMessages["jadwal_opsi_{$i}.different"] = "Opsi {$i} harus berbeda dengan opsi sebelumnya.";
+        }
+
+        $request->validate($opsiRules, $opsiMessages);
 
         // 2. Proses upload file jika ada
         if ($request->hasFile('surat_selesai_magang')) {
@@ -139,17 +146,21 @@ class MahasiswaController extends Controller
         }
 
         // 3. Update data jadwal
-        $magang->update([
+        $dataUpdate = [
             'jadwal_opsi_1' => $request->jadwal_opsi_1,
             'jadwal_opsi_2' => $request->jadwal_opsi_2,
             'jadwal_opsi_3' => $request->jadwal_opsi_3,
-            // 'ruangan_skp' => $request->ruangan_skp,
+            'jadwal_opsi_4' => $request->jadwal_opsi_4,
+            'jadwal_opsi_5' => $request->jadwal_opsi_5,
+            'jadwal_opsi_6' => $request->jadwal_opsi_6,
+            'jadwal_opsi_7' => $request->jadwal_opsi_7,
             'status_jadwal_skp' => 'menunggu',
             'keterangan_tolak_jadwal' => null,
             'surat_selesai_magang' => $magang->surat_selesai_magang // Simpan path surat
-        ]);
+        ];
+        $magang->update($dataUpdate);
 
-        return redirect()->back()->with('success', '3 Opsi jadwal dan Surat Selesai Magang berhasil diajukan. Silakan tunggu persetujuan dari Dosen Pembimbing.');
+        return redirect()->back()->with('success', '7 Opsi jadwal (1 minggu) dan Surat Selesai Magang berhasil diajukan. Silakan tunggu persetujuan dari Dosen Pembimbing.');
     }
 
     public function riwayatMagang()

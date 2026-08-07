@@ -17,6 +17,7 @@
                     <tr>
                         <th class="ps-4">Judul Pengumuman</th>
                         <th>Target Angkatan</th>
+                        <th>Deadline</th>
                         <th>Tanggal Dibuat</th>
                         <th class="text-center">Aksi</th>
                     </tr>
@@ -26,6 +27,16 @@
                         <tr>
                             <td class="ps-4 fw-bold">{{ $p->judul }}</td>
                             <td>{{ $p->target_angkatan ?? 'Semua' }}</td>
+                            <td>
+                                @if($p->deadline)
+                                    <span class="{{ $p->deadline->isPast() ? 'text-danger fw-bold' : '' }}">{{ $p->deadline->format('d M Y') }}</span>
+                                    @if($p->deadline->isPast())
+                                        <span class="badge bg-danger ms-1" style="font-size: 0.6rem;">Tutup</span>
+                                    @endif
+                                @else
+                                    <span class="text-muted">-</span>
+                                @endif
+                            </td>
                             <td>{{ $p->created_at->format('d M Y') }}</td>
                             <td class="text-center">
                                 <div class="d-flex justify-content-center gap-2">

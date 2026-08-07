@@ -194,18 +194,27 @@ class DosenController extends Controller
     public function approveJadwalSkp(Request $request, $id)
     {
         $request->validate([
-            'pilihan_opsi' => 'required|in:1,2,3'
+            'pilihan_opsi' => 'required|in:1,2,3,4,5,6,7'
         ]);
 
         $magang = Magang::where('id', $id)->where('dosen_id', Auth::id())->firstOrFail();
 
         $jadwalTerpilih = null;
-        if ($request->pilihan_opsi == '1') {
+        $pilihan = $request->pilihan_opsi;
+        if ($pilihan == '1') {
             $jadwalTerpilih = $magang->jadwal_opsi_1;
-        } elseif ($request->pilihan_opsi == '2') {
+        } elseif ($pilihan == '2') {
             $jadwalTerpilih = $magang->jadwal_opsi_2;
-        } elseif ($request->pilihan_opsi == '3') {
+        } elseif ($pilihan == '3') {
             $jadwalTerpilih = $magang->jadwal_opsi_3;
+        } elseif ($pilihan == '4') {
+            $jadwalTerpilih = $magang->jadwal_opsi_4;
+        } elseif ($pilihan == '5') {
+            $jadwalTerpilih = $magang->jadwal_opsi_5;
+        } elseif ($pilihan == '6') {
+            $jadwalTerpilih = $magang->jadwal_opsi_6;
+        } elseif ($pilihan == '7') {
+            $jadwalTerpilih = $magang->jadwal_opsi_7;
         }
 
         $magang->update([

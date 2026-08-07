@@ -57,9 +57,14 @@
                 <input type="text" name="target_angkatan" class="form-control" value="{{ $pengumuman->target_angkatan }}">
             </div>
             
-            <div class="mb-4">
+            <div class="mb-3">
                 <label class="form-label fw-bold">Link Pendaftaran</label>
                 <input type="url" name="link_pendaftaran" class="form-control" value="{{ $pengumuman->link_pendaftaran }}" required>
+            </div>
+            <div class="mb-4">
+                <label class="form-label fw-bold">Batas Pendaftaran (Deadline)</label>
+                <input type="date" name="deadline" class="form-control" value="{{ old('deadline', $pengumuman->deadline?->format('Y-m-d')) }}">
+                <small class="text-muted">Tanggal terakhir pendaftaran lowongan ini.</small>
             </div>
             
             <button type="submit" class="btn btn-primary w-100 fw-bold">Simpan Perubahan</button>

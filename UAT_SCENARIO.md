@@ -53,7 +53,7 @@
 
 | ID | Skenario | Langkah Pengujian | Hasil yang Diharapkan |
 |---|---|---|---|
-| M-SKP-01 | Mengajukan 3 opsi jadwal seminar | 1. Buka menu "Seminar/SKP"<br>2. Isi 3 opsi tanggal dan jam (semua tanggal berbeda dan di masa depan)<br>3. Isi ruangan seminar<br>4. Klik "Ajukan Jadwal" | Jadwal tersimpan, status_jadwal_skp = "menunggu" |
+| M-SKP-01 | Mengajukan 7 opsi jadwal seminar (1 minggu) | 1. Buka menu "Seminar/SKP"<br>2. Isi 7 opsi tanggal dan jam (semua tanggal berbeda dan di masa depan)<br>3. Isi ruangan seminar<br>4. Klik "Ajukan Jadwal" | Jadwal tersimpan, status_jadwal_skp = "menunggu" |
 | M-SKP-02 | Mengajukan jadwal dengan tanggal sudah lewat | 1. Pilih tanggal yang sudah berlalu<br>2. Klik "Ajukan Jadwal" | Sistem menolak, muncul validasi tanggal harus di masa depan |
 | M-SKP-03 | Mengajukan jadwal dengan 2 tanggal sama | 1. Isi opsi 1 dan opsi 2 dengan tanggal sama<br>2. Klik "Ajukan Jadwal" | Sistem menolak, muncul validasi tanggal harus berbeda |
 | M-SKP-04 | Submit nilai seminar dan file seminar | 1. Setelah jadwal disetujui dosen<br>2. Isi nilai (A/B/C/D/E)<br>3. Upload file seminar (PDF)<br>4. Klik "Simpan" | Data tersimpan, status_skp otomatis menjadi "sudah" |

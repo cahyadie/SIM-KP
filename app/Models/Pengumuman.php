@@ -11,4 +11,8 @@ class Pengumuman extends Model
     
     protected $table = 'pengumuman';
     protected $guarded = ['id']; // Memperbolehkan semua kolom diisi kecuali ID
+
+    protected $casts = [
+        'deadline' => 'date',
+    ];
 }

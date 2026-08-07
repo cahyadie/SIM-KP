@@ -27,7 +27,8 @@ class PengumumanController extends Controller
         $request->validate([
             'judul'            => 'required',
             'deskripsi'        => 'required',
-            'link_pendaftaran' => 'required|url'
+            'link_pendaftaran' => 'required|url',
+            'deadline'         => 'nullable|date|after:today'
         ]);
 
         Pengumuman::create($request->all());
@@ -53,7 +54,8 @@ class PengumumanController extends Controller
         $request->validate([
             'judul'            => 'required',
             'deskripsi'        => 'required',
-            'link_pendaftaran' => 'required|url'
+            'link_pendaftaran' => 'required|url',
+            'deadline'         => 'nullable|date|after:today'
         ]);
 
         $pengumuman = Pengumuman::findOrFail($id);

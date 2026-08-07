@@ -110,6 +110,14 @@
                                     <div class="d-flex align-items-center text-secondary" style="font-size: 0.85rem;">
                                         <i class="bi bi-calendar-event text-warning me-1"></i> Diposting: {{ $l->created_at->diffForHumans() }}
                                     </div>
+                                    @if($l->deadline)
+                                        <div class="d-flex align-items-center {{ $l->deadline->isPast() ? 'text-danger' : 'text-secondary' }}" style="font-size: 0.85rem;">
+                                            <i class="bi bi-hourglass-split me-1"></i> Deadline: {{ $l->deadline->format('d M Y') }}
+                                            @if($l->deadline->isPast())
+                                                <span class="badge bg-danger ms-1" style="font-size: 0.6rem;">Tutup</span>
+                                            @endif
+                                        </div>
+                                    @endif
                                 </div>
                             </div>
 
