@@ -7,7 +7,7 @@
     <div class="col-md-12">
         
         @if(session('success'))
-            <div class="alert alert-success">{{ session('success') }}</div>
+            <div class="alert alert-success flash-alert">{{ session('success') }}</div>
         @endif
 
         {{-- BAGIAN ATAS: Informasi Filter & Tombol Aksi --}}

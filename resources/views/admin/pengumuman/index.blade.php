@@ -7,7 +7,7 @@
     </div>
 
     @if(session('success'))
-        <div class="alert alert-success">{{ session('success') }}</div>
+        <div class="alert alert-success flash-alert">{{ session('success') }}</div>
     @endif
 
     <div class="card border-0 shadow-sm">

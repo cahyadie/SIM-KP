@@ -87,7 +87,7 @@
     <div class="col-md-11 col-lg-11">
 
         @if(session('success'))
-            <div class="alert alert-success border-0 shadow-sm rounded-4 mb-4">
+            <div class="alert alert-success border-0 shadow-sm rounded-4 mb-4 flash-alert">
                 <i class="bi bi-check-circle-fill me-2"></i> {{ session('success') }}
             </div>
         @endif

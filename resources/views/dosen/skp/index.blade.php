@@ -84,7 +84,7 @@
 
     {{-- FLASH MESSAGE --}}
     @if(session('success'))
-        <div class="alert alert-success border-0 shadow-sm rounded-4 mb-4 d-flex align-items-center">
+        <div class="alert alert-success border-0 shadow-sm rounded-4 mb-4 d-flex align-items-center flash-alert">
             <i class="bi bi-check-circle-fill me-2 fs-5"></i>
             <div>{{ session('success') }}</div>
         </div>

@@ -147,6 +147,25 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
     <script>
+        // Auto-hide flash messages (success/error) after 3 detik
+        document.addEventListener('DOMContentLoaded', function() {
+            const flashAlerts = document.querySelectorAll('.flash-alert');
+            if (flashAlerts.length === 0) return;
+
+            setTimeout(function() {
+                flashAlerts.forEach(function(alertEl) {
+                    alertEl.classList.add('fade');
+                    if (window.bootstrap && window.bootstrap.Alert) {
+                        window.bootstrap.Alert.getOrCreateInstance(alertEl).close();
+                    } else {
+                        alertEl.classList.remove('show');
+                        setTimeout(function() { alertEl.remove(); }, 500);
+                    }
+                });
+            }, 3000);
+        });
+    </script>
+    <script>
         document.addEventListener('DOMContentLoaded', function() {
             const body = document.body;
             const sidebarToggle = document.getElementById('sidebarToggle');

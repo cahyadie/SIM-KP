@@ -22,7 +22,7 @@
 
     {{-- ALERT SUKSES --}}
     @if(session('success'))
-        <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm rounded-4 mb-4 d-flex align-items-center p-3" role="alert">
+        <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm rounded-4 mb-4 d-flex align-items-center p-3 flash-alert" role="alert">
             <i class="bi bi-check-circle-fill text-success fs-4 me-3"></i> 
             <div class="fw-medium text-dark">{{ session('success') }}</div>
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>

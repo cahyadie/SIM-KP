@@ -180,7 +180,7 @@
 
     {{-- FLASH MESSAGE PENGISIAN PROFIL / SUKSES LAINNYA --}}
     @if(session('success'))
-        <div class="alert alert-success border-0 shadow-sm rounded-4 mb-4 d-flex align-items-center">
+        <div class="alert alert-success border-0 shadow-sm rounded-4 mb-4 d-flex align-items-center flash-alert">
             <i class="bi bi-check-circle-fill fs-4 me-3"></i>
             <div>
                 <strong>Berhasil!</strong><br>

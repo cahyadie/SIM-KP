@@ -21,7 +21,7 @@
 
                 {{-- ALERT SUKSES UMUM --}}
                 @if(session('success'))
-                    <div class="alert alert-success border-0 shadow-sm d-flex align-items-center mb-4 rounded-4 p-3">
+                    <div class="alert alert-success border-0 shadow-sm d-flex align-items-center mb-4 rounded-4 p-3 flash-alert">
                         <i class="bi bi-check-circle-fill text-success fs-4 me-3"></i>
                         <div class="fw-medium text-dark">{{ session('success') }}</div>
                         <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
