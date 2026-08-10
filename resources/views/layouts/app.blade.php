@@ -56,7 +56,7 @@
                 </div>
 
                 <div class="d-flex align-items-center">
-                    @if(Auth::user()->role === 'dosen')
+                    @if(in_array(Auth::user()->role, ['dosen', 'kaprodi']))
                         @php
                             $notifCount = Auth::user()->unreadNotifications()->count();
                             $notifs = Auth::user()->unreadNotifications()->latest()->limit(10)->get();
@@ -72,7 +72,7 @@
                                 <div class="d-flex justify-content-between align-items-center px-3 py-2 notification-header">
                                     <span class="fw-bold">Notifikasi</span>
                                     @if($notifCount > 0)
-                                        <form action="{{ route('dosen.notifikasi.read-all') }}" method="POST" class="d-inline">
+                                        <form action="{{ route('notifikasi.read-all') }}" method="POST" class="d-inline">
                                             @csrf
                                             <button type="submit" class="btn btn-sm btn-link p-0 notification-readall">Tandai semua dibaca</button>
                                         </form>
@@ -81,7 +81,7 @@
                                 <div class="notification-scroll">
                                     @forelse($notifs as $n)
                                         @php $nData = (array) $n->data; @endphp
-                                        <a href="{{ route('dosen.notifikasi.go', $n->id) }}" class="notification-item">
+                                        <a href="{{ route('notifikasi.go', $n->id) }}" class="notification-item">
                                             <span class="notification-icon"><i class="bi {{ $nData['icon'] ?? 'bi-bell' }}"></i></span>
                                             <span class="notification-body">
                                                 <span class="notification-text">{{ $nData['pesan'] ?? '' }}</span>
@@ -98,7 +98,7 @@
                                         </div>
                                     @endforelse
                                 </div>
-                                <a href="{{ route('dosen.notifikasi.index') }}" class="notification-footer">Lihat Semua Notifikasi</a>
+                                <a href="{{ route('notifikasi.index') }}" class="notification-footer">Lihat Semua Notifikasi</a>
                             </div>
                         </div>
                     @endif

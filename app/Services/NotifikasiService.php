@@ -9,32 +9,75 @@ use App\Notifications\MagangNotification;
 class NotifikasiService
 {
     /**
-     * Kirim notifikasi ke dosen, opsional dengan proteksi anti-duplikat.
+     * Kirim notifikasi ke dosen/kaprodi, opsional dengan proteksi anti-duplikat.
+     * Mengembalikan true jika notifikasi benar-benar dikirim.
      */
     public static function kirim(
-        User $dosen,
+        User $user,
         string $jenis,
         string $pesan,
         string $url,
         string $icon = 'bi-bell',
         ?int $magangId = null,
         bool $dedup = false,
-    ): void {
-        if (! $dosen || $dosen->role !== 'dosen') {
-            return;
+    ): bool {
+        if (! $user || ! in_array($user->role, ['dosen', 'kaprodi'])) {
+            return false;
         }
 
-        if ($dedup && self::sudahAda($dosen, $jenis, $magangId)) {
-            return;
+        if ($dedup && self::sudahAda($user, $jenis, $magangId)) {
+            return false;
         }
 
-        $dosen->notify(new MagangNotification($jenis, $pesan, $url, $icon, $magangId));
+        $user->notify(new MagangNotification($jenis, $pesan, $url, $icon, $magangId));
+
+        return true;
     }
 
     /**
-     * Kirim notifikasi "selesai magang" untuk semua dosen pembimbing yang
-     * masa magangnya sudah lewat. Dipakai oleh scheduler dan fallback
-     * dashboard dosen. Mengembalikan jumlah notifikasi yang dikirim.
+     * Kirim notifikasi ke dosen pembimbing dan semua user berperan kaprodi,
+     * masing-masing dengan URL target sesuai rolenya.
+     */
+    public static function kirimKeSemua(
+        Magang $magang,
+        string $jenis,
+        string $pesan,
+        string $icon = 'bi-bell',
+        bool $dedup = false,
+    ): int {
+        $jumlah = 0;
+
+        if ($magang->dosen) {
+            $jumlah += self::kirim(
+                $magang->dosen,
+                $jenis,
+                $pesan,
+                self::targetUrl($magang->dosen, $jenis, $magang),
+                $icon,
+                $magang->id,
+                $dedup,
+            ) ? 1 : 0;
+        }
+
+        foreach (User::where('role', 'kaprodi')->get() as $kaprodi) {
+            $jumlah += self::kirim(
+                $kaprodi,
+                $jenis,
+                $pesan,
+                self::targetUrl($kaprodi, $jenis, $magang),
+                $icon,
+                $magang->id,
+                $dedup,
+            ) ? 1 : 0;
+        }
+
+        return $jumlah;
+    }
+
+    /**
+     * Kirim notifikasi "selesai magang" untuk semua dosen pembimbing dan
+     * kaprodi yang masa magangnya sudah lewat. Dipakai oleh scheduler dan
+     * fallback dashboard. Mengembalikan jumlah notifikasi yang dikirim.
      */
     public static function kirimSelesaiMagang(): int
     {
@@ -46,48 +89,45 @@ class NotifikasiService
         $jumlah = 0;
 
         foreach ($magangs as $magang) {
-            $dosen = $magang->dosen;
-
-            if (! $dosen) {
-                continue;
-            }
-
             $pesan = 'Mahasiswa '.$magang->mahasiswa->user->name.' telah menyelesaikan masa magang';
 
-            $sebelumnya = $dosen->notifications()
-                ->where('type', MagangNotification::class)
-                ->whereJsonContains('data->magang_id', $magang->id)
-                ->whereJsonContains('data->jenis', 'selesai_magang')
-                ->exists();
-
-            if ($sebelumnya) {
-                continue;
-            }
-
-            $dosen->notify(new MagangNotification(
-                'selesai_magang',
-                $pesan,
-                route('dosen.bimbingan.detail', $magang->id),
-                'bi-flag-fill',
-                $magang->id,
-            ));
-
-            $jumlah++;
+            $jumlah += self::kirimKeSemua($magang, 'selesai_magang', $pesan, 'bi-flag-fill', true);
         }
 
         return $jumlah;
     }
 
-    private static function sudahAda(User $dosen, string $jenis, ?int $magangId): bool
+    private static function sudahAda(User $user, string $jenis, ?int $magangId): bool
     {
         if ($magangId === null) {
             return false;
         }
 
-        return $dosen->notifications()
+        return $user->notifications()
             ->where('type', MagangNotification::class)
             ->whereJsonContains('data->magang_id', $magangId)
             ->whereJsonContains('data->jenis', $jenis)
             ->exists();
+    }
+
+    private static function targetUrl(User $user, string $jenis, Magang $magang): string
+    {
+        if ($user->role === 'kaprodi') {
+            return match ($jenis) {
+                'mulai_magang', 'selesai_magang' => route('kaprodi.riwayat-magang.show', $magang->id),
+                'logbook' => route('kaprodi.monitoring.show', $magang->id),
+                'ajukan_jadwal' => route('kaprodi.skp.show', $magang->id),
+                'selesai_seminar' => route('kaprodi.skp'),
+                default => route('kaprodi.dashboard'),
+            };
+        }
+
+        return match ($jenis) {
+            'mulai_magang', 'selesai_magang' => route('dosen.bimbingan.detail', $magang->id),
+            'logbook' => route('dosen.bimbingan.logbook', $magang->id),
+            'ajukan_jadwal' => route('dosen.skp.respon', $magang->id),
+            'selesai_seminar' => route('dosen.riwayat-magang.index'),
+            default => route('dosen.dashboard'),
+        };
     }
 }

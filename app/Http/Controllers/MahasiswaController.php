@@ -69,13 +69,11 @@ class MahasiswaController extends Controller
 
         $magang->update($dataUpdate);
 
-        NotifikasiService::kirim(
-            $magang->dosen,
+        NotifikasiService::kirimKeSemua(
+            $magang,
             'selesai_seminar',
             'Mahasiswa '.$magang->mahasiswa->user->name.' menyelesaikan seminar — SKP terbit',
-            route('dosen.riwayat-magang.index'),
             'bi-award-fill',
-            $magang->id,
         );
 
         return redirect()->back()->with('success', 'Data seminar berhasil disimpan dan SKP telah diterbitkan!');
@@ -108,13 +106,11 @@ class MahasiswaController extends Controller
             'surat_selesai_magang' => $magang->surat_selesai_magang,
         ]);
 
-        NotifikasiService::kirim(
-            $magang->dosen,
+        NotifikasiService::kirimKeSemua(
+            $magang,
             'ajukan_jadwal',
             'Mahasiswa '.$magang->mahasiswa->user->name.' mengajukan jadwal SKP & surat selesai magang',
-            route('dosen.skp.respon', $magang->id),
             'bi-calendar2-week-fill',
-            $magang->id,
             dedup: true,
         );
 

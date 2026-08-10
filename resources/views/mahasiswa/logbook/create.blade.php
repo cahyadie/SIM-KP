@@ -101,7 +101,7 @@
                         </div>
                     </div>
                 @endforeach
-            </div>>
+            </div>
 
             <div class="d-grid mb-5 mt-4">
                 <button type="submit" class="btn btn-primary btn-lg fw-bold rounded-3 shadow-sm">

@@ -21,6 +21,11 @@ class NotifikasiTest extends TestCase
         return User::factory()->create(['role' => 'dosen']);
     }
 
+    private function buatKaprodi(): User
+    {
+        return User::factory()->create(['role' => 'kaprodi']);
+    }
+
     private function buatMahasiswa(): User
     {
         $user = User::factory()->create(['role' => 'mahasiswa']);
@@ -105,6 +110,52 @@ class NotifikasiTest extends TestCase
 
         $notif = $magang->dosen->notifications()->first();
         $this->assertSame('logbook', $notif->data['jenis']);
+    }
+
+    public function test_kaprodi_menerima_notifikasi_saat_magang_mulai()
+    {
+        $kaprodi = $this->buatKaprodi();
+        $dosen = $this->buatDosen();
+        $mahasiswa = $this->buatMahasiswa();
+
+        $this->actingAs($mahasiswa)->post('/mahasiswa/daftar', [
+            'dosen_id' => $dosen->id,
+            'nama_perusahaan' => 'PT Baru',
+            'alamat' => 'Jl. Baru',
+            'latitude' => '-6.2',
+            'longitude' => '106.8',
+            'kategori_industri' => 'Teknologi',
+            'tanggal_mulai' => now()->addDays(1)->toDateString(),
+            'tanggal_selesai' => now()->addDays(60)->toDateString(),
+            'status_gaji' => 'unpaid',
+            'tema_magang' => 'Mobile',
+        ])->assertRedirect(route('mahasiswa.dashboard'));
+
+        $this->assertDatabaseCount('notifications', 2);
+
+        $notifKaprodi = $kaprodi->notifications()->first();
+        $this->assertSame('mulai_magang', $notifKaprodi->data['jenis']);
+        $this->assertSame(route('kaprodi.riwayat-magang.show', $notifKaprodi->data['magang_id']), $notifKaprodi->data['url']);
+    }
+
+    public function test_kaprodi_menerima_notifikasi_logbook()
+    {
+        $this->buatKaprodi();
+        $magang = $this->buatMagang();
+        $kaprodi = User::where('role', 'kaprodi')->first();
+
+        $this->actingAs($magang->mahasiswa->user)->post('/mahasiswa/magang/'.$magang->id.'/logbook', [
+            'minggu_ke' => 1,
+            'tgl_mulai' => $magang->tanggal_mulai->toDateString(),
+            'tgl_selesai' => $magang->tanggal_mulai->copy()->addDays(6)->toDateString(),
+            'log' => [
+                ['hari' => 'Senin', 'kegiatan' => 'Ngoding', 'permasalahan' => '-', 'solusi' => '-'],
+            ],
+        ])->assertRedirect(route('mahasiswa.logbook.index', $magang->id));
+
+        $notif = $kaprodi->notifications()->first();
+        $this->assertSame('logbook', $notif->data['jenis']);
+        $this->assertSame(route('kaprodi.monitoring.show', $magang->id), $notif->data['url']);
     }
 
     public function test_pengajuan_jadwal_mengirim_notifikasi_ke_dosen()
@@ -198,8 +249,30 @@ class NotifikasiTest extends TestCase
         $this->assertNull($notif->read_at);
 
         $this->actingAs($dosen)
-            ->get('/dosen/notifikasi/'.$notif->id.'/go')
+            ->get('/notifikasi/'.$notif->id.'/go')
             ->assertRedirect(route('dosen.bimbingan.logbook', $magang->id));
+
+        $this->assertNotNull($notif->fresh()->read_at);
+    }
+
+    public function test_kaprodi_membuka_notifikasi_redirect_ke_halaman_kaprodi()
+    {
+        $magang = $this->buatMagang();
+        $kaprodi = $this->buatKaprodi();
+
+        $kaprodi->notify(new MagangNotification(
+            'mulai_magang',
+            'Pesan uji',
+            route('kaprodi.riwayat-magang.show', $magang->id),
+            'bi-bell',
+            $magang->id,
+        ));
+
+        $notif = $kaprodi->notifications()->first();
+
+        $this->actingAs($kaprodi)
+            ->get('/notifikasi/'.$notif->id.'/go')
+            ->assertRedirect(route('kaprodi.riwayat-magang.show', $magang->id));
 
         $this->assertNotNull($notif->fresh()->read_at);
     }
@@ -215,7 +288,7 @@ class NotifikasiTest extends TestCase
 
         $this->assertSame(2, $dosen->unreadNotifications()->count());
 
-        $this->actingAs($dosen)->post('/dosen/notifikasi/read-all')->assertRedirect();
+        $this->actingAs($dosen)->post('/notifikasi/read-all')->assertRedirect();
 
         $this->assertSame(0, $dosen->fresh()->unreadNotifications()->count());
     }
@@ -227,6 +300,16 @@ class NotifikasiTest extends TestCase
 
         $dosen->notify(new MagangNotification('logbook', 'Pesan uji', route('dosen.dashboard'), 'bi-bell', $magang->id));
 
-        $this->actingAs($dosen)->get('/dosen/notifikasi')->assertStatus(200);
+        $this->actingAs($dosen)->get('/notifikasi')->assertStatus(200);
+    }
+
+    public function test_kaprodi_akses_halaman_notifikasi()
+    {
+        $magang = $this->buatMagang();
+        $kaprodi = $this->buatKaprodi();
+
+        $kaprodi->notify(new MagangNotification('logbook', 'Pesan uji', route('kaprodi.dashboard'), 'bi-bell', $magang->id));
+
+        $this->actingAs($kaprodi)->get('/notifikasi')->assertStatus(200);
     }
 }

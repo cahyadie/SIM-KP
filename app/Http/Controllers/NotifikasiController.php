@@ -24,7 +24,9 @@ class NotifikasiController extends Controller
 
         $data = (array) $notif->data;
 
-        return redirect($data['url'] ?? route('dosen.dashboard'));
+        $fallback = Auth::user()->role === 'kaprodi' ? 'kaprodi.dashboard' : 'dosen.dashboard';
+
+        return redirect($data['url'] ?? route($fallback));
     }
 
     public function read(string $id)

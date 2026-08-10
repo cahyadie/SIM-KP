@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Magang;
 use App\Models\Mahasiswa;
+use App\Services\NotifikasiService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
@@ -41,6 +42,8 @@ class DashboardController extends Controller
 
     public function kaprodi()
     {
+        NotifikasiService::kirimSelesaiMagang();
+
         $statusSkp = Magang::selectRaw('status_skp, COUNT(*) as total')
             ->diterima()
             ->groupBy('status_skp')
@@ -251,19 +254,28 @@ class DashboardController extends Controller
         return $magangs
             ->groupBy('perusahaan_id')
             ->map(function ($items) {
-                $first = $items->first();
+                $aktif = $items->filter(function ($m) {
+                    return $m->status_skp === 'belum' && $m->tanggal_selesai?->gte(now()->startOfDay());
+                });
+
+                if ($aktif->isEmpty()) {
+                    return null;
+                }
+
+                $first = $aktif->first();
                 $perusahaan = $first->perusahaan;
 
                 return [
-                    'nama_mhs' => $items->pluck('mahasiswa.user.name')->toArray(),
+                    'nama_mhs' => $aktif->pluck('mahasiswa.user.name')->toArray(),
                     'perusahaan' => $perusahaan->nama_perusahaan,
                     'lat' => $perusahaan->latitude,
                     'lng' => $perusahaan->longitude,
-                    'status' => $items->pluck('status_gaji')->first(),
-                    'status_skp' => $items->every(fn ($m) => $m->status_skp === 'sudah') ? 'sudah' : 'belum',
-                    'is_selesai' => $items->every(fn ($m) => $m->tanggal_selesai?->isPast()),
+                    'status' => $aktif->pluck('status_gaji')->first(),
+                    'status_skp' => 'belum',
+                    'is_selesai' => false,
                 ];
             })
+            ->filter()
             ->values();
     }
 

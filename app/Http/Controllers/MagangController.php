@@ -44,14 +44,11 @@ class MagangController extends Controller
             'file_surat_kaprodi' => $filePath,
         ]);
 
-        $dosen = User::find($request->dosen_id);
-        NotifikasiService::kirim(
-            $dosen,
+        NotifikasiService::kirimKeSemua(
+            $magang,
             'mulai_magang',
             'Mahasiswa '.$mahasiswa->user->name.' mulai magang di '.$magang->perusahaan->nama_perusahaan,
-            route('dosen.bimbingan.detail', $magang->id),
             'bi-rocket-takeoff-fill',
-            $magang->id,
         );
 
         return redirect()->route('mahasiswa.dashboard')

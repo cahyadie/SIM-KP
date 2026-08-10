@@ -7,10 +7,10 @@
     <div class="d-flex align-items-center justify-content-between mb-4">
         <div>
             <h4 class="fw-bold mb-0">Notifikasi</h4>
-            <small class="text-muted">Semua aktivitas mahasiswa bimbingan Anda</small>
+            <small class="text-muted">Semua aktivitas mahasiswa di sistem</small>
         </div>
         @if($notifikasi->total() > 0)
-            <form action="{{ route('dosen.notifikasi.read-all') }}" method="POST">
+            <form action="{{ route('notifikasi.read-all') }}" method="POST">
                 @csrf
                 <button type="submit" class="btn btn-outline-primary btn-sm shadow-sm">
                     <i class="bi bi-check2-all me-1"></i> Tandai semua dibaca
@@ -23,7 +23,7 @@
         <div class="card-body p-0">
             @forelse($notifikasi as $n)
                 @php $nData = (array) $n->data; @endphp
-                <a href="{{ route('dosen.notifikasi.go', $n->id) }}"
+                <a href="{{ route('notifikasi.go', $n->id) }}"
                    class="notification-list-item {{ is_null($n->read_at) ? 'unread' : '' }}">
                     <span class="notification-icon">
                         <i class="bi {{ $nData['icon'] ?? 'bi-bell' }}"></i>

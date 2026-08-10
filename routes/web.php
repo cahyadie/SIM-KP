@@ -82,11 +82,14 @@ Route::middleware('auth')->group(function () {
 
         Route::get('/riwayat-magang', [DosenController::class, 'riwayatMagang'])->name('riwayat-magang.index');
         Route::get('/riwayat-magang/{id}', [DosenController::class, 'showRiwayat'])->name('riwayat-magang.show');
+    });
 
-        Route::get('/notifikasi', [NotifikasiController::class, 'index'])->name('notifikasi.index');
-        Route::get('/notifikasi/{id}/go', [NotifikasiController::class, 'go'])->name('notifikasi.go');
-        Route::post('/notifikasi/{id}/read', [NotifikasiController::class, 'read'])->name('notifikasi.read');
-        Route::post('/notifikasi/read-all', [NotifikasiController::class, 'readAll'])->name('notifikasi.read-all');
+    // NOTIFIKASI (dosen & kaprodi)
+    Route::middleware('role:dosen,kaprodi')->prefix('notifikasi')->name('notifikasi.')->group(function () {
+        Route::post('/read-all', [NotifikasiController::class, 'readAll'])->name('read-all');
+        Route::get('/', [NotifikasiController::class, 'index'])->name('index');
+        Route::get('/{id}/go', [NotifikasiController::class, 'go'])->name('go');
+        Route::post('/{id}/read', [NotifikasiController::class, 'read'])->name('read');
     });
 
     // KAPRODI

@@ -48,21 +48,21 @@ class DosenController extends Controller
             ];
         });
 
-        $marker_locations = $bimbingan->groupBy('perusahaan_id')->map(function ($magangs) {
+        $bimbinganAktif = $bimbingan->filter(function ($m) {
+            return $m->status_skp === 'belum'
+                && Carbon::parse($m->tanggal_selesai)->endOfDay()->isFuture();
+        });
+
+        $marker_locations = $bimbinganAktif->groupBy('perusahaan_id')->map(function ($magangs) {
             $first = $magangs->first();
             $perusahaan = $first->perusahaan;
-
-            $hasActive = $magangs->contains(function ($m) {
-                return $m->status_skp === 'belum'
-                    && Carbon::parse($m->tanggal_selesai)->endOfDay()->isFuture();
-            });
 
             return [
                 'nama_mhs' => $magangs->pluck('mahasiswa.user.name')->toArray(),
                 'perusahaan' => $perusahaan->nama_perusahaan,
                 'lat' => $perusahaan->latitude,
                 'lng' => $perusahaan->longitude,
-                'status' => $hasActive ? 'Aktif Magang' : 'Proses Seminar',
+                'status' => 'Aktif Magang',
             ];
         })->values();
 

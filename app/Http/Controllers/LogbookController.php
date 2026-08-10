@@ -94,13 +94,11 @@ class LogbookController extends Controller
             'isi_logbook' => $request->log,
         ]);
 
-        NotifikasiService::kirim(
-            $magang->dosen,
+        NotifikasiService::kirimKeSemua(
+            $magang,
             'logbook',
             'Mahasiswa '.$magang->mahasiswa->user->name.' mengisi logbook Minggu Ke-'.$request->minggu_ke,
-            route('dosen.bimbingan.logbook', $magang->id),
             'bi-journal-bookmark-fill',
-            $magang->id,
         );
 
         return redirect()->route('mahasiswa.logbook.index', $id)
