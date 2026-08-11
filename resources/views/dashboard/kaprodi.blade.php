@@ -119,6 +119,7 @@
                                             <th>Perusahaan</th>
                                             <th>Tanggal Mulai</th>
                                             <th>Status</th>
+                                            <th class="text-center">Aksi</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -144,10 +145,15 @@
                                                         <span class="dot bg-success"></span> Aktif Magang
                                                     </span>
                                                 </td>
+                                                <td class="text-center">
+                                                    <a href="{{ route('kaprodi.riwayat-magang.show', $magang->id) }}" class="btn btn-sm btn-outline-primary">
+                                                        <i class="bi bi-eye"></i> Detail
+                                                    </a>
+                                                </td>
                                             </tr>
                                         @empty
                                             <tr>
-                                                <td colspan="4" class="text-center text-muted py-4">Tidak ada data.</td>
+                                                <td colspan="5" class="text-center text-muted py-4">Tidak ada data.</td>
                                             </tr>
                                         @endforelse
                                     </tbody>
@@ -165,6 +171,7 @@
                                             <th>Perusahaan</th>
                                             <th>Tgl Selesai Magang</th>
                                             <th>Status SKP</th>
+                                            <th class="text-center">Aksi</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -196,10 +203,15 @@
                                                         <span class="dot bg-warning"></span> Belum SKP
                                                     </span>
                                                 </td>
+                                                <td class="text-center">
+                                                    <a href="{{ route('kaprodi.riwayat-magang.show', $magang->id) }}" class="btn btn-sm btn-outline-primary">
+                                                        <i class="bi bi-eye"></i> Detail
+                                                    </a>
+                                                </td>
                                             </tr>
                                         @empty
                                             <tr>
-                                                <td colspan="4" class="text-center text-muted py-4">Semua sudah menyelesaikan
+                                                <td colspan="5" class="text-center text-muted py-4">Semua sudah menyelesaikan
                                                     SKP.</td>
                                             </tr>
                                         @endforelse
@@ -218,6 +230,7 @@
                                             <th>Perusahaan</th>
                                             <th>Terbit SKP</th>
                                             <th>Status</th>
+                                            <th class="text-center">Aksi</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -243,10 +256,15 @@
                                                         <span class="dot bg-success"></span> Selesai
                                                     </span>
                                                 </td>
+                                                <td class="text-center">
+                                                    <a href="{{ route('kaprodi.riwayat-magang.show', $magang->id) }}" class="btn btn-sm btn-outline-primary">
+                                                        <i class="bi bi-eye"></i> Detail
+                                                    </a>
+                                                </td>
                                             </tr>
                                         @empty
                                             <tr>
-                                                <td colspan="4" class="text-center text-muted py-4">Belum ada data.</td>
+                                                <td colspan="5" class="text-center text-muted py-4">Belum ada data.</td>
                                             </tr>
                                         @endforelse
                                     </tbody>

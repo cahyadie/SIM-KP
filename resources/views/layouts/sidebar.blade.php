@@ -129,8 +129,8 @@
                         
                         @if($aktif)
                             <a href="{{ route('mahasiswa.logbook.index', $aktif->id) }}" 
-                               class="list-group-item ps-5 {{ request()->routeIs('logbook.*') ? 'active' : '' }}"
-                               style="border-left: 3px solid transparent; {{ request()->routeIs('logbook.*') ? 'border-left-color: var(--bs-primary);' : '' }}">
+                               class="list-group-item ps-5 {{ request()->routeIs('mahasiswa.logbook.*') ? 'active' : '' }}"
+                               style="border-left: 3px solid transparent; {{ request()->routeIs('mahasiswa.logbook.*') ? 'border-left-color: var(--bs-primary);' : '' }}">
                                 <i class="bi bi-journal-text"></i> <span>Isi Logbook</span>
                             </a>
                         @endif

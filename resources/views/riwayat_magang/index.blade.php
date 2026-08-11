@@ -237,7 +237,7 @@
                                                 }
                                             @endphp
 
-                                            <a href="{{ $detailRoute }}" class="btn btn-info btn-sm text-white shadow-sm"
+                                            <a href="{{ $detailRoute }}" class="btn btn-sm btn-outline-primary"
                                                 title="Lihat Detail">
                                                 <i class="bi bi-eye"></i> Detail
                                             </a>

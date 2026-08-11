@@ -30,11 +30,10 @@
         @endphp
 
         {{-- STATUS BANNER --}}
-        <div class="alert alert-{{ str_replace(' text-dark', '', $statusColor) }} shadow-sm d-flex align-items-center mb-4 border-0 border-start border-5 border-{{ str_replace(' text-dark', '', $statusColor) }}">
-            <i class="bi {{ $icon }} fs-3 me-3 text-{{ str_replace(' text-dark', '', $statusColor) }}"></i>
+        <div class="alert alert-{{ str_replace(' text-dark', '', $statusColor) }} align-items-center mb-4 {{ str_replace(' text-dark', '', $statusColor) }}">
             <div>
-                <h6 class="mb-0 fw-bold">Status Magang Saat Ini</h6>
-                <span class="badge bg-{{ $statusColor }} mt-1 fs-6">{{ $statusText }}</span>
+                <h6 class="mb-0 ">Status Magang Saat Ini</h6>
+                <span class="badge bg-{{ $statusColor }} mt-1 fs-8">{{ $statusText }}</span>
             </div>
         </div>
 
@@ -119,7 +118,7 @@
                             </tr>
                             <tr>
                                 <td class="text-muted">Periode Magang</td>
-                                <td class="fw-bold text-danger">: {{ \Carbon\Carbon::parse($magang->tanggal_mulai)->format('d M Y') }} s/d {{ \Carbon\Carbon::parse($magang->tanggal_selesai)->format('d M Y') }}</td>
+                                <td class="fw-bold ">: {{ \Carbon\Carbon::parse($magang->tanggal_mulai)->format('d M Y') }} s/d {{ \Carbon\Carbon::parse($magang->tanggal_selesai)->format('d M Y') }}</td>
                             </tr>
                         </table>
                     </div>

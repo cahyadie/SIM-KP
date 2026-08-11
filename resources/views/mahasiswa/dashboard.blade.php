@@ -255,7 +255,7 @@
 
     {{-- ALERT AGENDA SKP MENDATANG --}}
     @if($magang && $magang->status_jadwal_skp == 'disetujui' && $magang->status_skp == 'belum')
-        <div class="alert bg-white border-0 shadow-sm d-flex align-items-center mb-4 rounded-4 border-start border-5 border-primary">
+        <div class="alert bg-white border-0 shadow-sm d-flex align-items-center mb-4 rounded-4 ">
             <div class="bg-primary-light text-primary rounded-circle d-flex justify-content-center align-items-center me-3"
                 style="width: 48px; height: 48px; flex-shrink:0;">
                 <i class="bi bi-calendar-event fs-4"></i>
